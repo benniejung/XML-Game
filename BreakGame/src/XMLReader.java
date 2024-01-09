@@ -32,7 +32,11 @@ public class XMLReader {
 	static public String E_ENEMY = "Enemy";
 	static public String E_METEOR = "Meteor";
 	static public String E_PLAYER = "Player";
-	
+	static public String E_BULLET = "Bullet";
+	static public String E_GAMEMANAGEMENT = "GameManagement";
+	static public String E_TIME = "Time";
+	static public String E_LIFE = "Life";
+
 	private Node startFrameElement = null;
 	private Node screenElement = null;
 	private Node startPanelElement = null;

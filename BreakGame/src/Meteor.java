@@ -17,6 +17,8 @@ public class Meteor extends Label implements Runnable {
 	public int getLife() {return life;}
 	public int getSpeed() {return speed;}
 	
+	public void setLife(int newLife) {life = newLife;}
+	
 	@Override
 	public void run() {
 		while(flag) {

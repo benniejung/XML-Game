@@ -20,6 +20,7 @@ import org.w3c.dom.NodeList;
 public class StartFrame extends JFrame{
 	
 	StartFrame() {
+		setTitle("Break Game");
 		XMLReader xml = new XMLReader("start.xml"); // start.xml파일 객체 생성
 		Node StartFrameNode = xml.getStartFrameElement();
 		Node sizeNode = XMLReader.getNode(StartFrameNode, XMLReader.E_SIZE);
@@ -78,7 +79,13 @@ public class StartFrame extends JFrame{
 
 class Label extends JLabel {
 	Image img;
+	private int x,y,w,h;
 	public Label(int x, int y, int w, int h, ImageIcon icon) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+		
 		this.setBounds(x,y,w,h);
 		img = icon.getImage();
 	}
@@ -86,6 +93,7 @@ class Label extends JLabel {
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
 	}
+	public void setX(int newX) {x = newX;}
 }
 
 class StartPanel extends JPanel {
