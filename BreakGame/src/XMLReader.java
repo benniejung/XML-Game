@@ -24,32 +24,33 @@ public class XMLReader {
 	static public String E_MAINGAME = "MainGame";
 	static public String E_SCREEN = "Screen";
 	static public String E_STARTPANEL = "StartPanel";
-	static public String E_MAINPANEL = "MainPanel";
+	static public String E_GAMEPANEL = "GamePanel";
 	static public String E_BG ="Bg";
 	static public String E_LABEL ="Label";
 	static public String E_SIZE = "Size";
 	static public String E_OBJ = "Obj";
+	static public String E_ENEMIES = "Enemies";
 	static public String E_ENEMY = "Enemy";
 	static public String E_METEOR = "Meteor";
 	static public String E_PLAYER = "Player";
 	static public String E_BULLET = "Bullet";
-	static public String E_GAMEMANAGEMENT = "GameManagement";
-	static public String E_TIME = "Time";
-	static public String E_LIFE = "Life";
+	static public String E_ACTIVESCREEN = "ActiveScreen";
 
 	private Node startFrameElement = null;
 	private Node screenElement = null;
 	private Node startPanelElement = null;
 	private Node bgElement = null;
 	private Node mainGameElement = null;
-	private Node mainPanelElement = null;
+	private Node gamePanelElement = null;
+	private Node activeScreenElement = null;
 	
 	public Node getStartFrameElement() {return startFrameElement;}
 	public Node getScreenElement() {return screenElement;}
 	public Node getStartPanelElement() {return startPanelElement;}
 	public Node getBgElement() {return bgElement;}
 	public Node getMainGameElement() {return mainGameElement;}
-	public Node getMainPanelElement() {return mainPanelElement;}
+	public Node getGamePanelElement() {return gamePanelElement;}
+	public Node getActiveScreenElement() {return activeScreenElement;}
 	
 	private PrintWriter out;
 	
@@ -132,10 +133,16 @@ public class XMLReader {
 		    else if(node.getNodeName().equals(E_STARTPANEL)) {
 		    	startPanelElement = node;
 		    }
-		    else if(node.getNodeName().equals(E_MAINPANEL)) {
-		    	mainPanelElement = node;
+		    else if(node.getNodeName().equals(E_GAMEPANEL)) {
+		    	gamePanelElement = node;
 		    }
-			else if(node.getNodeName().equals(E_OBJ)) {
+		    else if(node.getNodeName().equals(E_ACTIVESCREEN)) {
+		    	activeScreenElement = node;
+		    }
+		    else if(node.getNodeName().equals(E_OBJ)) {
+			}
+		    else if(node.getNodeName().equals(E_ENEMY)) {
+		
 			}
 			printNode(node);
 			process(node); // recursion

@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="euc-kr" ?> 
 <MainGame>
-<Screen>
-	<Size w="800" h="600"></Size>
-</Screen>
-<MainPanel>
-	<Bg> </Bg>
-	<GameManagement> 
-		<Time x="280" y="10" w="90" h="20" num="45" img="image/time.png"/>	
-		<Life x="654" y="9" w="70" h="20" num="3" img="image/life.png"/>
-	</GameManagement>
-
-	<Enemy>
-		<Obj y="40" w="50" h="60" img="image/enemy_shoot.png"></Obj>
-
-	</Enemy>
-	<Meteor>
-		<Obj x="336" y="143" w="33" h="40" life = "1" speed = "10" img="image/meteo1.png"></Obj>
-		<Obj x="475" y="203" w="33" h="40" life = "1" speed = "7" img="image/meteo1.png"></Obj>
-		<Obj x="305" y="275" w="33" h="40" life = "1" speed = "7" img="image/meteo1.png"></Obj>
-		<Obj x="350" y="328" w="33" h="40" life = "1" speed = "7" img="image/meteo1.png"></Obj>
-		<Obj x="430" y="328" w="33" h="40" life = "1" speed = "7" img="image/meteo1.png"></Obj>
-		<Obj x="505" y="275" w="33" h="40" life = "1" speed = "10" img="image/meteo1.png"></Obj>
-		<Obj x="441" y="143" w="40" h="38" life = "2" speed = "7" img="image/meteo2.png"></Obj>
-		<Obj x="285" y="203" w="40" h="38" life = "2" speed = "7" img="image/meteo2.png"></Obj>
-	</Meteor>
-	<Player>
-		<Obj x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></Obj>
-	</Player>
-	<Bullet>
-		<Obj x="" y="447" w="22" h="40" img="image/bullet.png"></Obj>
-	</Bullet>
-</MainPanel>
+	<Screen>
+		<Size w="800" h="850"></Size>
+	</Screen>
+	<GamePanel>
+		<Bg>image/bg1.jpg</Bg>
+		<Sound></Sound>
+		<ActiveScreen> <!-- 실제 게임이 실행되는 화면 -->
+			<Enemies>
+				<Enemy x="230" y="250" w="60" h="72" type = "1" img="image/enemy1.png"></Enemy>
+				<Enemy x="314" y="250" w="60" h="72" type = "1" img="image/enemy1.png"></Enemy>
+				<Enemy x="396" y="250" w="60" h="72" type = "1" img="image/enemy1.png"></Enemy>
+				<Enemy x="480" y="250" w="60" h="72" type = "1" img="image/enemy1.png"></Enemy>
+				<Enemy x="150" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="232" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="307" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="400" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="485" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="257" y="342" w="60" h="72" type = "2" img="image/enemy2.png"></Enemy>
+				
+		
+			</Enemies>
+			<Player>
+				<Obj x="400" y="600" w="40" h="60" img="image/spaceship_small.png"></Obj>
+			</Player>
+			<ShieldBlocks>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+				<shieldBlock x="400" y="460" w="40" h="60" img="image/spaceship_small.png"></shieldBlock>
+			</ShieldBlocks>
+	
+			
+		</ActiveScreen>
+	</GamePanel>
 </MainGame>
