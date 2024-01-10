@@ -45,8 +45,7 @@ public class MainGame extends JFrame{
 		setResizable(false); // 크기 고정
 		setVisible(true);
 		
-        Thread thread = new Thread(gamePanel);
-        thread.start();
+  
 		
 	}
 	private void createGameMenu() {
@@ -66,9 +65,8 @@ public class MainGame extends JFrame{
 	
 }
 
-class GamePanel extends JPanel implements Runnable {
+class GamePanel extends JPanel {
 	private Label player;
-	private GameManagement time, life;
 	private Bullet bullet;
 	private Meteor meteor;
 	private Enemy enemy;
@@ -77,6 +75,7 @@ class GamePanel extends JPanel implements Runnable {
 	boolean crash = false;
 	String crashType;
 	ImageIcon bgImg;
+	MoveEnemyThread moveEnemyTh;
 	
 	public GamePanel(Node gamePanelNode) {
 		setLayout(null);
@@ -84,6 +83,8 @@ class GamePanel extends JPanel implements Runnable {
 		Node bgNode = XMLReader.getNode(gamePanelNode, XMLReader.E_BG);
 		bgImg = new ImageIcon(bgNode.getTextContent());
 		Node activeScreenNode = XMLReader.getNode(gamePanelNode, XMLReader.E_ACTIVESCREEN);
+		
+
 
 
 		// Player노드
@@ -128,9 +129,13 @@ class GamePanel extends JPanel implements Runnable {
 				
 			}
 		}
+
 		
 
 		addKeyListener(new GameKeyListener());
+		
+		moveEnemyTh = new MoveEnemyThread(enemyArr);
+		moveEnemyTh.start();
 
 	}
 	// 키 이벤트
@@ -138,22 +143,24 @@ class GamePanel extends JPanel implements Runnable {
 		//private BulletThread bulletThread;
 		@Override
 		public void keyPressed(KeyEvent e) {
-			int keyCode = e.getKeyCode();
-			int x;
-			switch(keyCode) {
-			case KeyEvent.VK_LEFT:
-				x = player.getX() -10;
-				if(x>=0) {
-					player.setLocation(x, player.getY());
-				}
-				break;
-			case KeyEvent.VK_RIGHT:
-				x = player.getX() + 10;
-				int playerWidth = player.getWidth();
-				if(x+playerWidth <= 800) {
-					player.setLocation(x, player.getY());
-				}
-				break;
+	        int keyCode = e.getKeyCode();
+	        int x;
+
+	        switch(keyCode) {
+	            case KeyEvent.VK_LEFT:
+	                x = player.getX() - 10;
+	                if (x >= 0) {
+	                    player.setLocation(x, player.getY());
+	                }
+	                break;
+	            case KeyEvent.VK_RIGHT:
+	                x = player.getX() + 10;
+	                int playerWidth = player.getWidth();
+	                if (x + playerWidth <= getWidth()) {
+	                    player.setLocation(x, player.getY());
+	                }
+	                break;
+
 			case KeyEvent.VK_SPACE:
 //				if (bulletThread == null || !bulletThread.isAlive()) {
 //					if (bullet.getY() <= 0) {
@@ -172,29 +179,62 @@ class GamePanel extends JPanel implements Runnable {
 				
 				break;
 			}
+	        System.out.println("Player location: (" + player.getX() + ", " + player.getY() + ")");
+			repaint();
 		}
 	}
-	public void moveEnemy() {
-		for(Enemy enemy : enemyArr) {
-			int x = (int)(Math.random()*this.getWidth()+20);
-			int y = (int)(Math.random()*this.getHeight()+20);
-        	crashCheck(enemy);
-        	if(crash) {
-//        		switch(crashType) {
-//        		case "left-crash":
-//        			enemy.setLocation(enemy.getX() + enemy.getSpeed(), enemy.getY());
-//        			break;
-//        		case "right-crash":
-//        			meteo.setLocation(enemy.getX() - enemy.getSpeed(), enemy.getY());
-//        			break;
-//        		}
-        	}
-            else {
-            	enemy.setLocation(x+5, y+5);
-            }
-        }
+//	public void moveEnemy() {
+//
+//			while(true) {
+//				for(Enemy enemy : enemyArr) {
+//					int directionX = (int)(Math.random()*2 +1);
+//					int directionY = (int)(Math.random()*2 +1);
+//					int ranX = (int)(Math.random()*40);
+//					int ranY = (int)(Math.random()*40);
+//					
+//					// +x, +y일 경우
+//					if(directionX == 1 && directionY == 1) {
+//						enemy.setLocation(enemy.getX() + ranX, enemy.getY() + ranY);
+//						int newX = enemy.getX() + ranX;
+//						int newY = enemy.getY() + ranY;
+//
+//						enemy.setXY(newX, newY);
+//					}
+//					// +x, -y
+//					else if(directionX == 1 && directionY == 2) {
+//						enemy.setLocation(enemy.getX() + ranX, enemy.getY() - ranY);
+//						int newX = enemy.getX() + ranX;
+//						int newY = enemy.getY() - ranY;
+//
+//						enemy.setXY(newX, newY);
+//
+//					}
+//					// -x, -y
+//					else if(directionX == 2 && directionY == 2) {
+//						enemy.setLocation(enemy.getX() - ranX, enemy.getY() - ranY);
+//						int newX = enemy.getX() - ranX;
+//						int newY = enemy.getY() - ranY;
+//
+//						enemy.setXY(newX, newY);
+//
+//					}
+//					// -x, +y
+//					else if(directionX == 2 && directionY == 1) {
+//						enemy.setLocation(enemy.getX() - ranX, enemy.getY() + ranY);
+//						int newX = enemy.getX() - ranX;
+//						int newY = enemy.getY() + ranY;
+//
+//						enemy.setXY(newX, newY);
+//
+//					}
+//
+//
+//				}
+//
+//			}
+//	}
 
-	}
+
 
 //	public void enemyShoot() {
 //		Timer timer = new Timer();
@@ -215,7 +255,7 @@ class GamePanel extends JPanel implements Runnable {
 //	}
 	public void process() {
 		// 운석 이동스레드
-		moveEnemy();
+		//moveEnemy();
 		
 //		// 적군 총알스레드
 //		enemyShoot();
@@ -223,20 +263,20 @@ class GamePanel extends JPanel implements Runnable {
 		// 화면 갱신
 		repaint();
 	}
-	@Override
-	public void run() {
-	    while(flag) {
-	        process();
-
-	        try {
-	            Thread.sleep(50);
-	        } catch (InterruptedException e) {
-	        	e.printStackTrace(); // 예외 로그 출력
-	            return;
-	        }
-	    }
-	}
-	
+//	@Override
+//	public void run() {
+//	    while(flag) {
+//	        process();
+//
+//	        try {
+//	            Thread.sleep(50);
+//	        } catch (InterruptedException e) {
+//	        	e.printStackTrace(); // 예외 로그 출력
+//	            return;
+//	        }
+//	    }
+//	}
+//	
 	// 왼쪽 또는 오른쪽 충돌 확인 메소드
 	public void crashCheck(Enemy enemy) {
 		if(enemy.getX() <= 0) { 
@@ -248,6 +288,7 @@ class GamePanel extends JPanel implements Runnable {
 			crashType = "right-crash";
 		}
 	}
+	
 	
 
 //	private class BulletThread extends Thread {
@@ -306,12 +347,76 @@ class GamePanel extends JPanel implements Runnable {
 //	        
 //
 //	    }
+	
 //	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(bgImg.getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
 	}
+	
 }
+class MoveEnemyThread extends Thread {
+	private Enemy enemy;
+	ArrayList<Enemy> enemyArr;
+	public MoveEnemyThread(ArrayList<Enemy> arr) {
+		this.enemyArr = arr;
+	}
+	@Override
+	public void run() {
+		while(true) {
+			for(Enemy enemy : enemyArr) {
+				int directionX = (int)(Math.random()*2 +1);
+				int directionY = (int)(Math.random()*2 +1);
+				int ranX = (int)(Math.random()*40);
+				int ranY = (int)(Math.random()*40);
+				
+				// +x, +y일 경우
+				if(directionX == 1 && directionY == 1) {
+					enemy.setLocation(enemy.getX() + ranX, enemy.getY() + ranY);
+					int newX = enemy.getX() + ranX;
+					int newY = enemy.getY() + ranY;
 
+					enemy.setXY(newX, newY);
+				}
+				// +x, -y
+				else if(directionX == 1 && directionY == 2) {
+					enemy.setLocation(enemy.getX() + ranX, enemy.getY() - ranY);
+					int newX = enemy.getX() + ranX;
+					int newY = enemy.getY() - ranY;
+
+					enemy.setXY(newX, newY);
+
+				}
+				// -x, -y
+				else if(directionX == 2 && directionY == 2) {
+					enemy.setLocation(enemy.getX() - ranX, enemy.getY() - ranY);
+					int newX = enemy.getX() - ranX;
+					int newY = enemy.getY() - ranY;
+
+					enemy.setXY(newX, newY);
+
+				}
+				// -x, +y
+				else if(directionX == 2 && directionY == 1) {
+					enemy.setLocation(enemy.getX() - ranX, enemy.getY() + ranY);
+					int newX = enemy.getX() - ranX;
+					int newY = enemy.getY() + ranY;
+
+					enemy.setXY(newX, newY);
+
+				}
+
+
+			}
+	        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+        	e.printStackTrace(); // 예외 로그 출력
+            return;
+        }
+
+		}
+	}
+}
 //class EnemyShootThread extends Thread {
 //	private Enemy enemy;
 //	public EnemyShootThread(Enemy enemy) {
@@ -351,18 +456,4 @@ class Bullet extends JLabel {
 	
 	public void setY(int newY) {y =newY;}
 	
-}
-class GameManagement extends JLabel {
-	Image img;
-	private int num;
-	public GameManagement(int x, int y, int w, int h, int num, ImageIcon icon) {
-		this.setBounds(x,y,w,h);
-		this.num = num;
-		img = icon.getImage();
-	}
-	public void paintComponent(Graphics g) {
-		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
-	}
-	public int getNum() {return num;}
-	public void setNum(int n) {num =n;}
 }

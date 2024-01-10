@@ -93,7 +93,9 @@ class Label extends JLabel {
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
 	}
-	public void setX(int newX) {x = newX;}
+	public int getX() {return x;}
+	public int getY() {return y;}
+	public void setXY(int newX, int newY) {x = newX; y = newY;}
 }
 
 class StartPanel extends JPanel {
