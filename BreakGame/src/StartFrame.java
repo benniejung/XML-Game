@@ -95,6 +95,8 @@ class Label extends JLabel {
 	}
 	public int getX() {return x;}
 	public int getY() {return y;}
+	public void setX(int newX) {x = newX;}
+
 	public void setXY(int newX, int newY) {x = newX; y = newY;}
 }
 
