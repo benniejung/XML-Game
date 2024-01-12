@@ -71,9 +71,13 @@ class GamePanel extends JPanel  {
 	private Player player;
 	private Meteor meteor;
 	private Enemy enemy;
+	private Label item;
+	private ShieldBlock shieldBlock;
 	private JLabel lifeTextLabel = new JLabel(new ImageIcon("image/life.png"));
+	private JLabel lifeLabel;
 	
 	
+	ArrayList<Label> itemArr = new ArrayList<Label>();
 	ArrayList<Enemy> enemyArr = new ArrayList<Enemy>();
 	boolean flag = true;
 	boolean crash = false;
@@ -83,6 +87,8 @@ class GamePanel extends JPanel  {
 	private Bullet bullet;
 	MoveEnemyThread moveEnemyTh;
 	EnemyShootThread enemyShootTh;
+	ItemThread itemTh;
+	
 	
 	public GamePanel(Node gamePanelNode) {
 		setLayout(null);
@@ -118,7 +124,7 @@ class GamePanel extends JPanel  {
 		// 생명 레이블
 		lifeTextLabel.setBounds(612, 24, 66, 21);
 		add(lifeTextLabel);
-		JLabel lifeLabel = new JLabel(Integer.toString(player.getLife()));
+		lifeLabel = new JLabel(Integer.toString(player.getLife()));
 		lifeLabel.setForeground(Color.white);
 		lifeLabel.setFont(new Font("Orbitron", Font.PLAIN, 25));
 		lifeLabel.setBounds(695, 24, 45, 21);
@@ -148,7 +154,53 @@ class GamePanel extends JPanel  {
 				
 			}
 		}
+		// ShieldBlock 노드
+		Node shieldBlocksNode = XMLReader.getNode(activeScreenNode, XMLReader.E_SHIELDBLOCKS);
+		NodeList shieldBlocksNodeList = shieldBlocksNode.getChildNodes();
+		for(int i=0; i<shieldBlocksNodeList.getLength(); i++) {
+			Node node = shieldBlocksNodeList.item(i);
+			if(node.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			// found!!, <Obj> tag
+			if(node.getNodeName().equals(XMLReader.E_SHIELDBLOCK)) {
+				int x = Integer.parseInt(XMLReader.getAttr(node, "x"));
+				int y = Integer.parseInt(XMLReader.getAttr(node, "y"));
+				int w = Integer.parseInt(XMLReader.getAttr(node, "w"));
+				int h = Integer.parseInt(XMLReader.getAttr(node, "h"));
+				
+				System.out.println(x+y);
+				ImageIcon icon = new ImageIcon(XMLReader.getAttr(node, "img"));
+				shieldBlock = new ShieldBlock(x,y,w,h,icon);
+		        add(shieldBlock);
 
+				
+				
+			}
+		}
+
+		// 아이템 노드
+		Node itemsNode = XMLReader.getNode(activeScreenNode, XMLReader.E_ITEMS);
+		NodeList itemsNodeList = itemsNode.getChildNodes();
+		for(int i=0; i<itemsNodeList.getLength(); i++) {
+			Node node = itemsNodeList.item(i);
+			if(node.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			// found!!, <Obj> tag
+			if(node.getNodeName().equals(XMLReader.E_ITEM)) {
+				int x = Integer.parseInt(XMLReader.getAttr(node, "x"));
+				int y = Integer.parseInt(XMLReader.getAttr(node, "y"));
+				int w = Integer.parseInt(XMLReader.getAttr(node, "w"));
+				int h = Integer.parseInt(XMLReader.getAttr(node, "h"));
+
+				ImageIcon icon = new ImageIcon(XMLReader.getAttr(node, "img"));
+				Label item = new Label(x,y,w,h,icon);
+				itemArr.add(item);
+				
+				
+			}
+		}
+		
+	
 		
 
 		
@@ -158,7 +210,21 @@ class GamePanel extends JPanel  {
 		
 		enemyShootTh = new EnemyShootThread(this,enemyArr, player,lifeLabel);
 		enemyShootTh.start();
+		
+		itemTh = new ItemThread(this, itemArr);
+		itemTh.start();
 	}
+
+	public void paintComponent(Graphics g) {
+		g.drawImage(bgImg.getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
+	}
+	public ArrayList<Label> getItemArr() {
+        return itemArr;
+    }
+
+    public void addItem(Label item) {
+        itemArr.add(item);
+    }
 	// 키 이벤트
 	public class GameKeyListener extends KeyAdapter {
 		private BulletThread bulletThread;
@@ -267,11 +333,7 @@ class GamePanel extends JPanel  {
 	    }
 	
 	}
-	public void paintComponent(Graphics g) {
-		g.drawImage(bgImg.getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
-	}
 	
-}
 
 // 적이 움직이는 스레드
 class MoveEnemyThread extends Thread {
@@ -298,7 +360,7 @@ class MoveEnemyThread extends Thread {
 	public void run() {
 		while(true) {
 			for(Enemy enemy : enemyArr) {
-				if(enemy.getType() == 2) {
+				if(enemy.getType() == 1 || enemy.getType() == 2) {
 				     int direction = (int) (Math.random() * 4+1);
 		             
 		             
@@ -373,7 +435,7 @@ class EnemyShootThread extends Thread {
     @Override
     public void run() {
         Timer timer = new Timer();
-        timer.schedule(new EnemyShootTask(), 0, 1500); // 1.5초 동안 적이 총알을 발사한다
+        timer.schedule(new EnemyShootTask(), 0, 1000); // 1.5초 동안 적이 총알을 발사한다
     }
 
     private class EnemyShootTask extends TimerTask {
@@ -434,9 +496,86 @@ class BulletMoveThread extends Thread {
         gamePanel.remove(bullet); // 원래있던 총알을 지우고
         gamePanel.repaint(); // 설정된 총알의 위치대로 총알을 그린다
     }
+ }
+
+// 아이템 스레드
+class ItemThread extends Thread {
+	private GamePanel gamePanel;
+	private ArrayList<Label> itemArr;
+	private ArrayList<Label> activeItem = new ArrayList<Label>();
+	public ItemThread(GamePanel gamePanel, ArrayList<Label> itemArr) {
+		this.gamePanel = gamePanel;
+		this.itemArr = itemArr;
+	}
+	public void moveItem(Label itemLabel) {
+		int initialX = itemLabel.getX();
+
+		System.out.println(itemArr.get(0).getX());
+        while (itemLabel.getX()>0) { // 총알이 패널의 높이에 도달할 때까지 발사한다
+			gamePanel.add(itemLabel);
+			
+			itemLabel.setXY(itemLabel.getX()-10, itemLabel.getY());
+			gamePanel.repaint();
+	        try {
+	            Thread.sleep(100);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+
+        }
+        gamePanel.remove(itemLabel);
+        itemLabel.setX(initialX);
+	}
+	@Override
+	public void run() {
+		while(true) {
+			int r = (int)(Math.random()*10+1);
+			Label itemLabel;
+			// 40%확률로 아이템 생성
+			if(r>=3 && r<5) {
+				itemLabel = itemArr.get(0);
+				moveItem(itemLabel);
+			}
+			else if(r>=1 && r<3) {
+				itemLabel = itemArr.get(1);
+				moveItem(itemLabel);
+			}
+
+	        try {
+	            Thread.sleep(2000);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+
+		}
+
+
+        
+	}
+}
 }
 
+
+
 // 클래스들
+class ShieldBlock extends JLabel {
+	Image img;
+	private int x,y,w,h;
+	public ShieldBlock(int x, int y, int w, int h, ImageIcon icon) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+
+		this.setBounds(x,y,w,h);
+		img = icon.getImage();
+	}
+	
+	public void paintComponent(Graphics g) {
+		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
+	}
+
+}
 class Player extends JLabel {
 	Image img;
 	private int x,y,w,h;
