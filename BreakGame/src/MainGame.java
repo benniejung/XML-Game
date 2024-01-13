@@ -30,6 +30,7 @@ public class MainGame extends JFrame{
 		setTitle("Break Game");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		XMLReader xml = new XMLReader("stage1.xml"); // start.xml파일 객체 생성
+		
 		Node mainGameNode = xml.getMainGameElement();
 		Node sizeNode = XMLReader.getNode(mainGameNode,XMLReader.E_SIZE);
 		
@@ -80,8 +81,6 @@ class GamePanel extends JPanel  {
 	ArrayList<Label> itemArr = new ArrayList<Label>();
 	ArrayList<Enemy> enemyArr = new ArrayList<Enemy>();
 	boolean flag = true;
-	boolean crash = false;
-	String crashType;
 	ImageIcon bgImg;
 	
 	private Bullet bullet;
@@ -213,6 +212,7 @@ class GamePanel extends JPanel  {
 		
 		itemTh = new ItemThread(this, itemArr);
 		itemTh.start();
+	
 	}
 
 	public void paintComponent(Graphics g) {
@@ -279,6 +279,7 @@ class GamePanel extends JPanel  {
 	
 
 	private class BulletThread extends Thread {
+
 		private Bullet bullet;
 		
 		public BulletThread(Bullet bullet) {
@@ -340,79 +341,129 @@ class MoveEnemyThread extends Thread {
 	private GamePanel gamePanel;
 	private Enemy enemy;
 	boolean crash = false;
-	String crashType;
+	String crashType ="";
 	ArrayList<Enemy> enemyArr;
 	public MoveEnemyThread(GamePanel gamePanel, ArrayList<Enemy> arr) {
 		this.gamePanel = gamePanel;
 		this.enemyArr = arr;
 	}
 	// 왼쪽 또는 오른쪽 충돌 확인 메소드
-	public void crashCheck(int x, int y) {
-		if (x >= 0 && x + gamePanel.getWidth() >= 800 &&
-                y >= 0 && y + gamePanel.getHeight() >= 550) {
+	public void crashCheck(Enemy enemy) {
+		if (enemy.getX() <= 0) {
 			crash = true;
+			crashType = "left-crash";
 		}
-		else crash = false;
+
+		else if(enemy.getX() + enemy.getWidth() >= gamePanel.getWidth()) {
+			crash = true;
+			crashType = "right-crash";
+
+		}
+		else {
+			crash = false;
+		}
+
 
 	}
 	
-	@Override
-	public void run() {
+	public void moveEnemy1(Enemy enemy) {
 		while(true) {
-			for(Enemy enemy : enemyArr) {
-				if(enemy.getType() == 1 || enemy.getType() == 2) {
-				     int direction = (int) (Math.random() * 4+1);
-		             
-		             
-		             int x = enemy.getX();
-		             int y = enemy.getY();
+	        if(player.getX() < enemy.getX()) { //아바타가 왼쪽에 있으면
+	            enemy.setX(enemy.getX() - 5);
+	            enemy.setLocation(enemy.getX(), enemy.getY());
+	        } else if (player.getX() > enemy.getX()) {//아바타가 오른쪽에 있으면
+	        	enemy.setX(enemy.getX() + 5);
+	        	enemy.setLocation(enemy.getX(), enemy.getY());
+	        }
 
-					// 위
-					if (direction == 1) {
-						int newY = y - enemy.getSpeed();
-						if (newY >= 0) {
-							enemy.setLocation(x, newY);
-							enemy.setXY(x, newY);
-						}
-
-					}
-					// 아래
-					else if (direction == 2) {
-						int newY = y + enemy.getSpeed();
-						if (newY <= 600) {
-							enemy.setLocation(x, newY);
-							enemy.setXY(x, newY);
-						}
-					}
-					// 왼쪽
-					else if (direction == 3) {
-						int newX = x - enemy.getSpeed();
-						if (newX >= 0) {
-							enemy.setLocation(newX, y);
-							enemy.setXY(newX, y);
-						}
-					}
-					// 오른쪽
-					else if (direction == 4) {
-						int newX = x + enemy.getSpeed();
-						if (newX <= gamePanel.getWidth() - enemy.getWidth()) {
-							enemy.setLocation(newX, y);
-							enemy.setXY(newX, y);
-						}
-					}
-				}
-					
+	        if (player.getY() < enemy.getY()) {//아바타가 위쪽에 있으면
+	        	enemy.setY(enemy.getY() - 5);
+	        	enemy.setLocation(enemy.getX(), enemy.getY());
+	        } else if (player.getY() > enemy.getY()) {//아바타가 아래쪽에 있으면
+	        	enemy.setY(enemy.getY() + 5);
+	        	enemy.setLocation(enemy.getX(), enemy.getY());
+	        }
+	        
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace(); // 예외 로그 출력
+				return;
 			}
 
-	        try {
-            Thread.sleep(450);
-        } catch (InterruptedException e) {
-        	e.printStackTrace(); // 예외 로그 출력
-            return;
-        }
 
 		}
+
 	}
+	@Override
+	public void run() {
+			while(true) {
+				for(Enemy enemy : enemyArr) {
+
+				
+					if(enemy.getType() == 2) {
+						
+						crashCheck(enemy);
+						if(crash) {
+							int newX;
+			        		switch(crashType) {
+			        		case "left-crash":
+			        			newX = enemy.getX() + enemy.getSpeed();
+			        			enemy.setLocation(newX, enemy.getY());
+			        			enemy.setXY(newX, enemy.getY());
+			        			System.out.println(enemy.getX());
+			        			
+
+			        			break;
+			        		case "right-crash":
+			        			newX = enemy.getX() - enemy.getSpeed();
+			        			enemy.setLocation(newX, enemy.getY());
+			        			enemy.setXY(newX, enemy.getY());
+
+			        			break;
+			        		}
+			        		crash = false; 
+						}
+						 else {
+							 if(crashType.equals("left-crash")) {
+				        			int newX = enemy.getX() + enemy.getSpeed();
+				        			enemy.setLocation(newX, enemy.getY());
+				        			enemy.setXY(newX, enemy.getY());
+
+
+							 }
+							 else if(crashType.equals("right-crash")) {
+				        			int newX = enemy.getX() - enemy.getSpeed();
+				        			enemy.setLocation(newX, enemy.getY());
+				        			enemy.setXY(newX, enemy.getY());
+		
+
+							 }
+							 else {
+				        			int newX = enemy.getX() - enemy.getSpeed();
+				        			enemy.setLocation(newX, enemy.getY());
+				        			enemy.setXY(newX, enemy.getY());
+
+							 }
+							 
+				         }
+				}
+
+			}
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace(); // 예외 로그 출력
+					return;
+				}
+
+		}
+			
+
+
+
+
+}
 }
 
 // enemy가 총알 발사하는 스레드
@@ -435,28 +486,30 @@ class EnemyShootThread extends Thread {
     @Override
     public void run() {
         Timer timer = new Timer();
-        timer.schedule(new EnemyShootTask(), 0, 1000); // 1.5초 동안 적이 총알을 발사한다
+        timer.schedule(new EnemyShootTask(), 0, 1500); // 1.5초 동안 적이 총알을 발사한다
     }
 
-    private class EnemyShootTask extends TimerTask {
-        @Override
-        public void run() {
-            int r = (int) (Math.random() * enemyArr.size());
-            Enemy randomEnemy = enemyArr.get(r);
-            int type = randomEnemy.getType();
+	    private class EnemyShootTask extends TimerTask {
+	        @Override
+	        public void run() {
+                int r = (int) (Math.random() * enemyArr.size());
+                Enemy randomEnemy = enemyArr.get(r);
+                int type = randomEnemy.getType();
 
-            if (type == 1) {
-                return;
-            } else { // type이 2인 적만 총알을 발사한다
-                bullet.setLocation(randomEnemy.getX(), randomEnemy.getY()); // 처음에는 선택된 적의 위치에서 발사
-                
-                gamePanel.add(bullet); // 화면에 붙인다
+                if (type == 1) {
+                    return;
+                } else { // type이 2인 적만 총알을 발사한다
+                    bullet.setLocation(randomEnemy.getX(), randomEnemy.getY()); // 처음에는 선택된 적의 위치에서 발사
+                    gamePanel.add(bullet); // 화면에 붙인다
+                	
+                    BulletMoveThread bulletMoveThread = new BulletMoveThread(gamePanel, bullet, player, lifeLabel); // 총알 스레드 시작
+                    bulletMoveThread.start();
 
-                BulletMoveThread bulletMoveThread = new BulletMoveThread(gamePanel, bullet, player, lifeLabel); // 총알 스레드 시작
-                bulletMoveThread.start();
-            }
-        }
-    }
+              	}
+       
+        	}
+
+	}
 }
 // 적이 발산한 총알이 움직이는 스레드
 class BulletMoveThread extends Thread {
@@ -487,14 +540,15 @@ class BulletMoveThread extends Thread {
             }
             
             try {
-                Thread.sleep(40);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            gamePanel.repaint(); // 설정된 총알의 위치대로 총알을 그린다
         }
 
-        gamePanel.remove(bullet); // 원래있던 총알을 지우고
-        gamePanel.repaint(); // 설정된 총알의 위치대로 총알을 그린다
+        //gamePanel.remove(bullet); // 원래있던 총알을 지우고
+        
     }
  }
 
@@ -616,4 +670,5 @@ class Bullet extends JLabel {
 	
 	public void setY(int newY) {y =newY;}
 	
+
 }
