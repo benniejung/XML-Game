@@ -35,10 +35,10 @@ public class XMLReader {
 	static public String E_PLAYER = "Player";
 	static public String E_BULLET = "Bullet";
 	static public String E_ACTIVESCREEN = "ActiveScreen";
-	static public String E_ITEM = "Item";
-	static public String E_ITEMS = "Items";
 	static public String E_SHIELDBLOCKS = "ShieldBlocks";
 	static public String E_SHIELDBLOCK = "ShieldBlock";
+	static public String E_ITEM = "Item";
+	static public String E_ITEMS = "Items";
 	
 	private Node startFrameElement = null;
 	private Node screenElement = null;
