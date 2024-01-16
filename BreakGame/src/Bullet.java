@@ -10,9 +10,12 @@ public class Bullet extends JLabel implements Runnable{
 	Image img;
 	public int y;
 	private GamePanel gamePanel;
+	private GameInfoPanel gameInfoPanel;
 	private Player player;
 	private ArrayList<ShieldBlock> shieldBlockArr;
-	public Bullet(int x, int y, int w, int h, ImageIcon icon, GamePanel gamePanel, Player player, ArrayList shieldBlockArr) {
+	JLabel lifeLabel;
+	private Thread bulletThread;
+	public Bullet(int x, int y, int w, int h, ImageIcon icon, GamePanel gamePanel, Player player, ArrayList shieldBlockArr, GameInfoPanel gameInfoPanel) {
 
 		this.setBounds(x, y,w,h);
 		this.y = y;
@@ -20,10 +23,11 @@ public class Bullet extends JLabel implements Runnable{
 		this.gamePanel = gamePanel;
 		this.player = player;
 		this.shieldBlockArr = shieldBlockArr;
+		this.gameInfoPanel = gameInfoPanel;
+		
 		gamePanel.add(this);
 		Thread th = new Thread(this);
 		th.start();
-
 	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
@@ -34,34 +38,36 @@ public class Bullet extends JLabel implements Runnable{
 	@Override
 	public void run() {
 		while(this.getY()<850) {
-			
 			this.setLocation(this.getX(), this.getY() + 10);
 			
             // 총알이 player에 닿았을 때
             if (this.getBounds().intersects(player.getBounds())) {
-            	int newLife = player.getLife()-1;
-            	gamePanel.lifeLabel.setText(Integer.toString(newLife));
-                player.setLife(newLife);
-                
+            	System.out.println(GameManagement.life);
+            	int newLife = GameManagement.life -1;
+            	gameInfoPanel.setLifeLabel(newLife);
+            	GameManagement.life = newLife;
                 gamePanel.remove(this);
-               //  생명이 0일 때 게임 종료 추가해야함!!
+//                //  생명이 0일 때 게임 종료 추가해야함!!
+//                if(player.getLife() == 0) {
+//                	bulletThread.interrupt();
+//                }
                 return; 
             }
             for (Iterator<ShieldBlock> iterator = shieldBlockArr.iterator(); iterator.hasNext();) {
             	ShieldBlock shieldBlock = iterator.next();
                 if (this.getBounds().intersects(shieldBlock.getBounds())) {
-                    
+                     
                     //handleCollision(shieldBlock, iterator);
                     gamePanel.remove(shieldBlock);
                     gamePanel.remove(this);
                     shieldBlockArr.remove(shieldBlock);
-                
+                 
                     return; 
                 }
             }
-  
-			try {
-				Thread.sleep(20);
+
+			try { 
+				Thread.sleep(30);
 							
 			} catch (InterruptedException e) {
 				System.out.println("stop");

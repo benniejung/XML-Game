@@ -10,7 +10,8 @@
 		</Sound>
 		<ActiveScreen> <!-- 실제 게임이 실행되는 화면 -->
 			<Enemies>
-				<Enemy x="150" y="75" w="300" h="250" type = "free" life = "2" speed = "5" img="image/enemy3.png"></Enemy>
+				<Enemy x="150" y="75" w="350" h="350" type = "Boss" life = "50" speed = "2" img="image/enemy3.png"></Enemy>
+				
 				<Enemy x="550" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy2.png"></Enemy>
 				<Enemy x="650" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy2.png"></Enemy>
 						

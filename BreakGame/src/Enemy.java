@@ -12,22 +12,23 @@ public class Enemy extends JLabel implements Runnable{
 	String type;
 	boolean crash = false;
 	String crashType = "";
-	public Enemy(int x, int y, int w, int h, String type, int life, int speed,ImageIcon icon) {
+	private GamePanel gamePanel;
+	private boolean flag;
+	
+	public Enemy(int x, int y, int w, int h, String type, int life, int speed,ImageIcon icon, GamePanel gamePanel) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
-		this.h = h;
+		this.h = h; 
 		this.setBounds(x,y,w,h);
 		this.life = life;
 		this.speed = speed;
 		this.type = type;
 		img = icon.getImage();
+		this.gamePanel = gamePanel;
 		
 		Thread th = new Thread(this);
 		th.start();
-		
-
-
 	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
@@ -68,15 +69,13 @@ public class Enemy extends JLabel implements Runnable{
 		else {
 			crash = false;
 		}
-
-
 	}
 
 	public void process() {
 		switch(type) {
 		case "Not Moving":
 			break;
-		case "LeftRight":
+		case "RightLeft":
 			crashCheck();
 			if(crash) {
 				crash = false; 
@@ -113,13 +112,12 @@ public class Enemy extends JLabel implements Runnable{
 
 				 }
 				 else {
-	        			int newX = x - speed;
+	        			int newX = x + speed;
 	        			this.setLocation(newX, y);
 	        			this.setXY(newX, y);
 	        			
 
-				 }
-				 
+				 } 
 	         }
 			break;
 		case "Free":
@@ -130,55 +128,124 @@ public class Enemy extends JLabel implements Runnable{
 			
 			// +x, +y일 경우
 			if(directionX == 1 && directionY == 1) {
-				this.setLocation(this.getX() + ranX, this.getY() + ranY);
-				int newX = this.getX() + ranX;
-				int newY = this.getY() + ranY;
+				int newX = this.getX() + this.getSpeed();
+				int newY = this.getY() + this.getSpeed();
+				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+					this.setLocation(newX, newY);
+					this.setXY(newX, newY);
 
-				this.setXY(newX, newY);
+				}
 			}
 			// +x, -y
 			else if(directionX == 1 && directionY == 2) {
-				this.setLocation(this.getX() + ranX, this.getY() - ranY);
-				int newX = this.getX() + ranX;
-				int newY = this.getY() - ranY;
+				int newX = this.getX() + this.getSpeed();
+				int newY = this.getY() - this.getSpeed();
 
-				this.setXY(newX, newY);
+				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+					this.setLocation(newX, newY);
+					this.setXY(newX, newY);
+
+				}
 
 			}
 			// -x, -y
 			else if(directionX == 2 && directionY == 2) {
-				this.setLocation(this.getX() - ranX, this.getY() - ranY);
-				int newX = this.getX() - ranX;
-				int newY = this.getY() - ranY;
+				int newX = this.getX() - this.getSpeed();
+				int newY = this.getY() - this.getSpeed();
+				
+				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+					this.setLocation(newX, newY);
+					this.setXY(newX, newY);
 
-				this.setXY(newX, newY);
+				}
 
 			}
 			// -x, +y
 			else if(directionX == 2 && directionY == 1) {
-				this.setLocation(this.getX() - ranX, this.getY() + ranY);
-				int newX = this.getX() - ranX;
-				int newY = this.getY() + ranY;
-
-				this.setXY(newX, newY);
-
+				int newX = this.getX() - this.getSpeed();
+				int newY = this.getY() + this.getSpeed();
+				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+					this.setLocation(newX, newY);
+					this.setXY(newX, newY);
+				}
 			}			
 			try {
-				Thread.sleep(50);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				System.out.println("stop");
 				e.printStackTrace();  // 예외 로그 출력
 				return;
 			}
 			break;
+			default:
+				crashCheck();
+				if(crash) {
+					crash = false; 
+					int newX;
+	        		switch(crashType) {
+	        		case "left-crash":
+	        			newX = x + speed;
+	        			this.setLocation(newX, y);
+	        			this.setXY(newX, y);
+
+	        			break;
+	        		case "right-crash":
+	        			newX = x - speed;
+	        			this.setLocation(newX, y);
+	        			this.setXY(newX, y);
+
+	        			break;
+	        		}
+	        		
+				}
+				 else {
+					 if(crashType.equals("left-crash")) {
+		        			int newX = x + speed;
+		        			this.setLocation(newX, y);
+		        			this.setXY(newX, y);
+ 
+
+					 }
+					 else if(crashType.equals("right-crash")) {
+		        			int newX = x - speed;
+		        			this.setLocation(newX, y);
+		        			this.setXY(newX, y);
+
+
+					 }
+					 else {
+		        			int newX = x - speed;
+		        			this.setLocation(newX, y);
+		        			this.setXY(newX, y);
+		        			
+
+					 } 
+		         }
+				break;
 
 		
 			
 		}
 	}
+    // 스레드 대기
+	synchronized private void waitFlag() {
+		
+		try { this.wait(); } 
+		catch (InterruptedException e) { } 
+		
+	}
+    // 스레드 깨우기
+	synchronized public void resumeTimer() { 
+		
+//		gamePanel.getRunning() = false;
+//		this.notify(); 
+		
+	}
+
 	@Override
-	public void run() {
+	public synchronized void run() {
 		while(true) {
+			if(!gamePanel.getRunning()) {waitFlag();}
 			process();
 			repaint();
 			try {
@@ -188,9 +255,10 @@ public class Enemy extends JLabel implements Runnable{
 				System.out.println("stop");
 				return;
 			}
-
+			if(GameManagement.life == 0) {
+				gamePanel.stopGame();
+			}
 		}
 		
 	}
-
 }
