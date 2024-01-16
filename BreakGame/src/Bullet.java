@@ -15,6 +15,10 @@ public class Bullet extends JLabel implements Runnable{
 	private ArrayList<ShieldBlock> shieldBlockArr;
 	JLabel lifeLabel;
 	private Thread bulletThread;
+	private boolean stopFlag = false;
+	private boolean getStopFlag() {return stopFlag;}
+	public void setStopFlag() {stopFlag = true;}
+
 	public Bullet(int x, int y, int w, int h, ImageIcon icon, GamePanel gamePanel, Player player, ArrayList shieldBlockArr, GameInfoPanel gameInfoPanel) {
 
 		this.setBounds(x, y,w,h);
@@ -35,9 +39,25 @@ public class Bullet extends JLabel implements Runnable{
 
 	public void setY(int newY) {y =newY;}
 	
+    // 스레드 대기
+	synchronized private void waitFlag() {
+		
+		try { this.wait(); } 
+		catch (InterruptedException e) { } 
+		
+	}
+    // 스레드 깨우기
+	synchronized public void resumeFlag() { 
+		stopFlag = false;
+		GameManagement.stopFlag = false;
+		this.notify(); 
+		
+	}
+
 	@Override
 	public void run() {
 		while(this.getY()<850) {
+			if(stopFlag == true) waitFlag();
 			this.setLocation(this.getX(), this.getY() + 10);
 			
             // 총알이 player에 닿았을 때

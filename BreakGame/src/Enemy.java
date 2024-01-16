@@ -13,8 +13,16 @@ public class Enemy extends JLabel implements Runnable{
 	boolean crash = false;
 	String crashType = "";
 	private GamePanel gamePanel;
-	private boolean flag;
-	
+	private boolean stopFlag = true;
+	private boolean getStopFlag() {return stopFlag;}
+	public void setStopFlag() {
+		if(stopFlag==true) {
+			stopFlag = false;
+		} else {
+			stopFlag = true;
+		}
+	}
+
 	public Enemy(int x, int y, int w, int h, String type, int life, int speed,ImageIcon icon, GamePanel gamePanel) {
 		this.x = x;
 		this.y = y;
@@ -228,24 +236,25 @@ public class Enemy extends JLabel implements Runnable{
 		}
 	}
     // 스레드 대기
-	synchronized private void waitFlag() {
+	synchronized public void waitFlag() {
 		
 		try { this.wait(); } 
 		catch (InterruptedException e) { } 
 		
 	}
     // 스레드 깨우기
-	synchronized public void resumeTimer() { 
+	synchronized public void resumeFlag() { 
 		
-//		gamePanel.getRunning() = false;
-//		this.notify(); 
+		stopFlag = false;
+		this.notify(); 
 		
 	}
 
 	@Override
 	public synchronized void run() {
+
 		while(true) {
-			if(!gamePanel.getRunning()) {waitFlag();}
+			if(stopFlag == true) waitFlag();
 			process();
 			repaint();
 			try {

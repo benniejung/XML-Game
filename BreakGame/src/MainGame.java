@@ -80,7 +80,9 @@ public class MainGame extends JFrame {
 		
 		JMenu audioMenu = new JMenu("Audio");
 		JMenu fileMenu = new JMenu("File");
+		JMenu startMenu = new JMenu("Start");
 		JMenu stopMenu = new JMenu("Stop");
+		
 		
 		JMenuItem [] audioItem = new JMenuItem[2];
 		JMenuItem [] fileItem = new JMenuItem[3];
@@ -88,7 +90,8 @@ public class MainGame extends JFrame {
 		FileMenuActionListener fileMenuActionListener = new FileMenuActionListener();
 		AudioMenuActionListener audioMenuActionListener = new AudioMenuActionListener();
 		StopMenuActionListener stopMenuActionListener = new StopMenuActionListener();
-		
+		StartMenuActionListener startMenuActionListener = new StartMenuActionListener();
+
 		// 파일 메뉴아이템
 		for(int i =0; i<fileItemTitle.length; i++) {
 			fileItem[i] = new JMenuItem(fileItemTitle[i]);
@@ -105,6 +108,11 @@ public class MainGame extends JFrame {
 
 		}
 		gameMenuBar.add(audioMenu);
+		// 게임 시작메뉴
+		JMenuItem startItem = new JMenuItem("Start");
+		startItem.addActionListener(startMenuActionListener);
+		startMenu.add(startItem);
+		gameMenuBar.add(startMenu);
 		// 게임 중지메뉴
 		JMenuItem stopItem = new JMenuItem("Stop");
 		JMenuItem resumeItem = new JMenuItem("Resume");
@@ -136,8 +144,18 @@ public class MainGame extends JFrame {
 			String cmd = e.getActionCommand(); // 선택한 메뉴아이템
 			if(cmd == "Stop") {
 				gamePanel.stopGame();
+				
 			}else {
 				gamePanel.resumeGame();
+			}
+		}
+	}
+	class StartMenuActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			String cmd = e.getActionCommand(); // 선택한 메뉴아이템
+			if(cmd == "Start") {
+				gamePanel.resumeGame();
+				
 			}
 		}
 	}
@@ -171,7 +189,15 @@ class GamePanel extends JPanel implements Runnable{
 	EnemyShootThread enemyShootTh;
 	ItemThread itemTh;
 	 
-	private static boolean gameRunning = true;
+	private boolean stopFlag = true;
+	private boolean getStopFlag() {return stopFlag;}
+	public void setStopFlag() {
+		if(stopFlag==true) {
+			stopFlag = false;
+		} else {
+			stopFlag = true;
+		}
+	}
 	
 	public GamePanel(Node gamePanelNode, GameInfoPanel gameInfoPanel) {
 		setLayout(new BorderLayout());
@@ -278,7 +304,7 @@ class GamePanel extends JPanel implements Runnable{
 //		moveEnemyTh = new MoveEnemyThread(this,enemyArr);
 //		moveEnemyTh.start();
 //		
-		enemyShootTh = new EnemyShootThread(this,enemyArr, player,lifeLabel, gameInfoPanel);
+		enemyShootTh = new EnemyShootThread(this,enemyArr, player,lifeLabel, gameInfoPanel, shieldBlockArr);
 		enemyShootTh.start();
 //		
 		itemTh = new ItemThread(this, itemArr);
@@ -366,32 +392,30 @@ class GamePanel extends JPanel implements Runnable{
 		}
 	    @Override
 	    public void run() {
-	    	if(gameRunning) {
-		    	while (bullet.getY() >0) {
-		    		add(bullet);
-		            bullet.setLocation(bullet.getX(), bullet.getY() - 10);
-		            for (Iterator<Enemy> iterator = enemyArr.iterator(); iterator.hasNext();) {
-		                Enemy enemy = iterator.next();
-		                if (bullet.getBounds().intersects(enemy.getBounds())) {
-		                    
-		                    handleCollision(enemy, iterator);
-		                    remove(bullet);
+	    	while (bullet.getY() >0) {
+	    		add(bullet);
+	            bullet.setLocation(bullet.getX(), bullet.getY() - 10);
+	            for (Iterator<Enemy> iterator = enemyArr.iterator(); iterator.hasNext();) {
+	                Enemy enemy = iterator.next();
+	                if (bullet.getBounds().intersects(enemy.getBounds())) {
 	                    
-		                    return; 
-		                }
-		            }
-		            repaint();
-			        
-			        try {
-			            Thread.sleep(10);
-			        } catch (InterruptedException e) {
-			        	e.printStackTrace(); 
-			            return;
-			        }
-			    }
-		    	remove(bullet);
+	                    handleCollision(enemy, iterator);
+	                    remove(bullet);
+                    
+	                    return; 
+	                }
+	            }
+	            repaint();
+		        
+		        try {
+		            Thread.sleep(10);
+		        } catch (InterruptedException e) {
+		        	e.printStackTrace(); 
+		            return;
+		        }
+		    }
+	    	remove(bullet);
 
-	    	}
 	    }
 	    private void handleCollision(Enemy enemy, Iterator it) {
 	        int currentLife = enemy.getLife();
@@ -409,151 +433,52 @@ class GamePanel extends JPanel implements Runnable{
 	    }
 	
 	}
-	public boolean getRunning() { return gameRunning;}
+	
     public void stopGame() {
-        gameRunning = false;
+        GameManagement.stopFlag = true;
+    	for(Enemy enemy:enemyArr) {
+    		enemy.setStopFlag();
+    	}
+        if(itemTh.stopFlag == false) {itemTh.setStopFlag();}
+        if(enemyShootTh.stopFlag ==false) {enemyShootTh.setStopFlag();}
+        this.waitFlag();
+        
 
     }
     public synchronized void resumeGame() {
-        gameRunning = true;
+    	GameManagement.stopFlag = false;
+    	for(Enemy enemy:enemyArr) {
+    		enemy.resumeFlag();
+    	}
+    	itemTh.resumeFlag();
+    	enemyShootTh.resumeFlag();
         this.notify();
     }
+    // 스레드 대기
+	synchronized public void waitFlag() {
+		
+		try { this.wait(); } 
+		catch (InterruptedException e) { } 
+		
+	}
 
 
+// GamePanel 스레드 동작 
     public synchronized void run() {
+    	if(stopFlag == true) {
+    		stopGame();
+    	}
         if (GameManagement.life == 0) {
-            gameRunning = false;
+            itemTh.interrupt();
+            enemyShootTh.interrupt();
+        	for(Enemy enemy:enemyArr) {
+        		enemy.waitFlag();
+        	}
+        	this.waitFlag();
+
         }
     }	
 
-//// 적이 움직이는 스레드
-//class MoveEnemyThread extends Thread {
-//	private GamePanel gamePanel;
-//	private Enemy enemy;
-//	boolean crash = false;
-//	String crashType ="";
-//	ArrayList<Enemy> enemyArr;
-//	public MoveEnemyThread(GamePanel gamePanel, ArrayList<Enemy> arr) {
-//		this.gamePanel = gamePanel;
-//		this.enemyArr = arr;
-//	}
-//	// 왼쪽 또는 오른쪽 충돌 확인 메소드
-//	public void crashCheck(Enemy enemy) {
-//		if (enemy.getX() <= 0) {
-//			crash = true;
-//			crashType = "left-crash";
-//		}
-//
-//		else if(enemy.getX() + enemy.getWidth() >= gamePanel.getWidth()) {
-//			crash = true;
-//			crashType = "right-crash";
-//
-//		}
-//		else {
-//			crash = false;
-//		}
-//
-//
-//	}
-//	
-//	public void moveEnemy1(Enemy enemy) {
-//		while(true) {
-//	        if(player.getX() < enemy.getX()) { // 아바타가 왼쪽에 있으면
-//	            enemy.setX(enemy.getX() - 5);
-//	            enemy.setLocation(enemy.getX(), enemy.getY());
-//	        } else if (player.getX() > enemy.getX()) {// 아바타가 오른쪽에 있으면
-//	        	enemy.setX(enemy.getX() + 5);
-//	        	enemy.setLocation(enemy.getX(), enemy.getY());
-//	        }
-//
-//	        if (player.getY() < enemy.getY()) {// 아바타가 위쪽에 있으면
-//	        	enemy.setY(enemy.getY() - 5);
-//	        	enemy.setLocation(enemy.getX(), enemy.getY());
-//	        } else if (player.getY() > enemy.getY()) {// 아바타가 아래쪽에 있으면
-//	        	enemy.setY(enemy.getY() + 5);
-//	        	enemy.setLocation(enemy.getX(), enemy.getY());
-//	        }
-//	        
-//			try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();  // 예외 로그 출력
-//				return;
-//			}
-//
-//
-//		}
-//
-//	}
-//	@Override
-//	public void run() {
-//			while(true) {
-//				for(Enemy enemy : enemyArr) {
-//				
-//					if(enemy.getType().equals("LeftRight")) {
-//						
-//						crashCheck(enemy);
-//						if(crash) {
-//							int newX;
-//			        		switch(crashType) {
-//			        		case "left-crash":
-//			        			newX = enemy.getX() + enemy.getSpeed();
-//			        			enemy.setLocation(newX, enemy.getY());
-//			        			enemy.setXY(newX, enemy.getY());
-//			        			
-//
-//			        			break;
-//			        		case "right-crash":
-//			        			newX = enemy.getX() - enemy.getSpeed();
-//			        			enemy.setLocation(newX, enemy.getY());
-//			        			enemy.setXY(newX, enemy.getY());
-//
-//			        			break;
-//			        		}
-//			        		crash = false; 
-//						}
-//						 else {
-//							 if(crashType.equals("left-crash")) {
-//				        			int newX = enemy.getX() + enemy.getSpeed();
-//				        			enemy.setLocation(newX, enemy.getY());
-//				        			enemy.setXY(newX, enemy.getY());
-//
-//
-//							 }
-//							 else if(crashType.equals("right-crash")) {
-//				        			int newX = enemy.getX() - enemy.getSpeed();
-//				        			enemy.setLocation(newX, enemy.getY());
-//				        			enemy.setXY(newX, enemy.getY());
-//		
-//
-//							 }
-//							 else {
-//				        			int newX = enemy.getX() - enemy.getSpeed();
-//				        			enemy.setLocation(newX, enemy.getY());
-//				        			enemy.setXY(newX, enemy.getY());
-//
-//							 }
-//							 
-//				         }
-//				}
-//
-//			}
-//				try {
-//					Thread.sleep(500);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace(); // 예외 로그 출력
-//					return;
-//				}
-//
-//		}
-//			
-//
-//
-//
-//
-//}
-//}
-//
 // enemy가 총알 발사하는 스레드
 class EnemyShootThread extends Thread {
     private GamePanel gamePanel;
@@ -563,13 +488,25 @@ class EnemyShootThread extends Thread {
     private JLabel lifeLabel;
     private ImageIcon bulletIcon = new ImageIcon("image/enemy_bullet.png");
     private GameInfoPanel gameInfoPanel;
+    private ArrayList<ShieldBlock> shieldBlockArr;
     
-    public EnemyShootThread(GamePanel gamePanel, ArrayList<Enemy> enemyArr, Player player, JLabel lifeLabel, GameInfoPanel gameInfoPanel) {
+	private boolean stopFlag = true;
+	private boolean getStopFlag() {return stopFlag;}
+	private void setStopFlag() {
+		if(stopFlag==true) {
+			stopFlag = false;
+		} else {
+			stopFlag = true;
+		}
+	}
+
+    public EnemyShootThread(GamePanel gamePanel, ArrayList<Enemy> enemyArr, Player player, JLabel lifeLabel, GameInfoPanel gameInfoPanel, ArrayList<ShieldBlock> shieldBlockArr) {
         this.gamePanel = gamePanel;
         this.enemyArr = enemyArr;
         this.player = player;
         this.lifeLabel = lifeLabel;
         this.gameInfoPanel = gameInfoPanel;
+        this.shieldBlockArr = shieldBlockArr;
         //this.bullet = new Bullet(0, 0, 40, 43, bulletIcon); // bullet 초기 위치 설정
     }
     
@@ -580,19 +517,34 @@ class EnemyShootThread extends Thread {
           Enemy randomEnemy = enemyArr.get(enemyNum);
           if(randomEnemy.getType().equals("LeftRight")) {
         	  Bullet bullet = new Bullet(randomEnemy.getX(), randomEnemy.getY(), 40,43, bulletIcon, gamePanel, player, shieldBlockArr, gameInfoPanel);
-        	  
+//        	  if(GameManagement.stopFlag == true) {
+//        		  bullet.setStopFlag();
+//        	  }
           }
           else i--;
     	} 
     	
     }
+    // 스레드 대기
+	synchronized private void waitFlag() {
+		
+		try { this.wait(); } 
+		catch (InterruptedException e) { } 
+		
+	}
+    // 스레드 깨우기
+	synchronized public void resumeFlag() { 
+		
+		GameManagement.stopFlag = false;
+		stopFlag = false;
+		this.notify(); 
+		
+	}
 
     @Override
-    public void run() {
-//        Timer timer = new Timer();
-//        timer.schedule(new EnemyShootTask(), 0, 1500); // 1.5초 동안 적이 총알을 발사한다
+    synchronized public void run() {
         while (true) {
-        	
+        	if(stopFlag == true) waitFlag();
         	setBullet();
             try {
                 Thread.sleep(4000);
@@ -603,74 +555,22 @@ class EnemyShootThread extends Thread {
         }
     }
 
-//	    private class EnemyShootTask extends TimerTask {
-//	        @Override
-//	        public void run() {
-//                int r = (int) (Math.random() * enemyArr.size());
-//                Enemy randomEnemy = enemyㄷArr.get(r);
-//                String type = randomEnemy.getType();
-//
-//                if (type == "No Moving") {
-//                    return;
-//                } else {  // type이 2인 적만 총알을 발사한다
-//                    bullet.setLocation(randomEnemy.getX(), randomEnemy.getY());//  처음에는 선택된 적의 위치에서 발사
-//                    gamePanel.add(bullet);  // 화면에 붙인다
-//                	
-//                    BulletMoveThread bulletMoveThread = new BulletMoveThread(gamePanel, bullet, player, lifeLabel); // 총알 스레드 시작
-//                    bulletMoveThread.start();
-//
-//              	}
-//       
-//        	}
-//
-//	}
 }
- // 적이 발산한 총알이 움직이는 스레드
-class BulletMoveThread extends Thread {
-    private GamePanel gamePanel;
-    private Bullet bullet;
-    private Player player;
-    private JLabel lifeLabel;
-
-    public BulletMoveThread(GamePanel gamePanel, Bullet bullet, Player player, JLabel lifeLabel) {
-        this.gamePanel = gamePanel;
-        this.bullet = bullet;
-        this.player = player;
-        this.lifeLabel = lifeLabel;
-    }
-
-    @Override
-    public void run() {
-        while (bullet.getY() <= gamePanel.getHeight()) { // 총알이 패널의 높이에 도달할 때까지 발사한다
-            bullet.setLocation(bullet.getX(), bullet.getY() + 10);
-            // 총알이 player에 닿았을 때
-            if (bullet.getBounds().intersects(player.getBounds())) {
-            	int newLife = player.getLife()-1;
-            	lifeLabel.setText(Integer.toString(newLife));
-                player.setLife(newLife);
-                
-               //  생명이 0일 때 게임 종료 추가해야함!!
-                return; 
-            }
-            
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            gamePanel.repaint(); // 설정된 총알의 위치대로 총알을 그린다
-        }
-
-        gamePanel.remove(bullet); // 원래있던 총알을 지우고
-        
-    }
- }
-
  // 아이템 스레드
 class ItemThread extends Thread {
 	private GamePanel gamePanel;
 	private ArrayList<Label> itemArr;
 	private ArrayList<Label> activeItem = new ArrayList<Label>();
+	private boolean stopFlag = true;
+	private boolean getStopFlag() {return stopFlag;}
+	private void setStopFlag() {
+		if(stopFlag==true) {
+			stopFlag = false;
+		} else {
+			stopFlag = true;
+		}
+	}
+	
 	public ItemThread(GamePanel gamePanel, ArrayList<Label> itemArr) {
 		this.gamePanel = gamePanel;
 		this.itemArr = itemArr;
@@ -696,9 +596,26 @@ class ItemThread extends Thread {
         gamePanel.remove(itemLabel);
         itemLabel.setX(initialX);
 	}
+    // 스레드 대기
+	synchronized private void waitFlag() {
+		
+		try { this.wait(); } 
+		catch (InterruptedException e) { } 
+		
+	}
+    // 스레드 깨우기
+	synchronized public void resumeFlag() { 
+		
+		GameManagement.stopFlag = false;
+		stopFlag = false;
+		this.notify(); 
+		
+	}
+
 	@Override
-	public void run() {
+	synchronized public void run() {
 		while(true) {
+			if(stopFlag == true) waitFlag();
 			int r = (int)(Math.random()*10+1);
 			Label itemLabel;
 			// 40%확률로 아이템 생성
@@ -716,11 +633,7 @@ class ItemThread extends Thread {
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
 	        }
-
 		}
-
-
-        
 	}
 }
 }
