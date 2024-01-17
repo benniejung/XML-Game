@@ -13,7 +13,7 @@ public class Enemy extends JLabel implements Runnable{
 	boolean crash = false;
 	String crashType = "";
 	private GamePanel gamePanel;
-	private boolean stopFlag = true;
+	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	public void setStopFlag() {
 		if(stopFlag==true) {
@@ -22,7 +22,8 @@ public class Enemy extends JLabel implements Runnable{
 			stopFlag = true;
 		}
 	}
-
+	private int loopN = 0;
+	private int n = 1;
 	public Enemy(int x, int y, int w, int h, String type, int life, int speed,ImageIcon icon, GamePanel gamePanel) {
 		this.x = x;
 		this.y = y;
@@ -129,56 +130,95 @@ public class Enemy extends JLabel implements Runnable{
 	         }
 			break;
 		case "Free":
-			int directionX = (int)(Math.random()*2 +1);
-			int directionY = (int)(Math.random()*2 +1);
-			int ranX = (int)(Math.random()*40);
-			int ranY = (int)(Math.random()*40);
+//			int directionX = (int)(Math.random()*2 +1);
+//			int directionY = (int)(Math.random()*2 +1);
+//			int ranX = (int)(Math.random()*40);
+//			int ranY = (int)(Math.random()*40);
 			
-			// +x, +y일 경우
-			if(directionX == 1 && directionY == 1) {
-				int newX = this.getX() + this.getSpeed();
-				int newY = this.getY() + this.getSpeed();
-				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
-					this.setLocation(newX, newY);
-					this.setXY(newX, newY);
-
-				}
+			if(loopN == 20*n) {
+				int newY = this.getY()+20;
+				this.setLocation(this.getX(), newY);
+				this.setXY(this.getX(), newY);
+				n++;
 			}
-			// +x, -y
-			else if(directionX == 1 && directionY == 2) {
-				int newX = this.getX() + this.getSpeed();
-				int newY = this.getY() - this.getSpeed();
+			int direction = (int)(Math.random()*2+1);
+			
+			crashCheck();
+			if(crash) {
+				crash = false;
+				if(crashType.equals("left-crash")) {
+					int newX = this.getX() + this.getSpeed();
+					this.setLocation(newX, this.getY());
+					this.setXY(newX, this.getY());
 
-				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
-					this.setLocation(newX, newY);
-					this.setXY(newX, newY);
+				} else {
+					int newX = this.getX() - this.getSpeed();
+					this.setLocation(newX, this.getY());
+					this.setXY(newX, this.getY());
 
 				}
+				loopN++;
+			} else {
+				if(direction == 1) { // 왼쪽이동
+					int newX = this.getX() - this.getSpeed();
+					this.setLocation(newX, this.getY());
+					this.setXY(newX, this.getY());
+				}
+				else {
+					int newX = this.getX() + this.getSpeed();
+					this.setLocation(newX, this.getY());
+					this.setXY(newX, this.getY());
+
+				}
+				loopN++;
 
 			}
-			// -x, -y
-			else if(directionX == 2 && directionY == 2) {
-				int newX = this.getX() - this.getSpeed();
-				int newY = this.getY() - this.getSpeed();
-				
-				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
-					this.setLocation(newX, newY);
-					this.setXY(newX, newY);
 
-				}
-
-			}
-			// -x, +y
-			else if(directionX == 2 && directionY == 1) {
-				int newX = this.getX() - this.getSpeed();
-				int newY = this.getY() + this.getSpeed();
-				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
-					this.setLocation(newX, newY);
-					this.setXY(newX, newY);
-				}
-			}			
+//			// +x, +y일 경우
+//			if(directionX == 1 && directionY == 1) {
+//				int newX = this.getX() + this.getSpeed();
+//				int newY = this.getY() + this.getSpeed();
+//				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+//					this.setLocation(newX, newY);
+//					this.setXY(newX, newY);
+//
+//				}
+//			}
+//			// +x, -y
+//			else if(directionX == 1 && directionY == 2) {
+//				int newX = this.getX() + this.getSpeed();
+//				int newY = this.getY() - this.getSpeed();
+//
+//				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+//					this.setLocation(newX, newY);
+//					this.setXY(newX, newY);
+//
+//				}
+//
+//			}
+//			// -x, -y
+//			else if(directionX == 2 && directionY == 2) {
+//				int newX = this.getX() - this.getSpeed();
+//				int newY = this.getY() - this.getSpeed();
+//				
+//				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+//					this.setLocation(newX, newY);
+//					this.setXY(newX, newY);
+//
+//				}
+//
+//			}
+//			// -x, +y
+//			else if(directionX == 2 && directionY == 1) {
+//				int newX = this.getX() - this.getSpeed();
+//				int newY = this.getY() + this.getSpeed();
+//				if(newX>0 || newX+this.getWidth()< 800 && newY>0 || newY<500) {
+//					this.setLocation(newX, newY);
+//					this.setXY(newX, newY);
+//				}
+//		}		
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				System.out.println("stop");
 				e.printStackTrace();  // 예외 로그 출력

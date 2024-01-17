@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="euc-kr" ?> 
+<MainGame>
+	<Screen>
+		<Size w="800" h="900"></Size>
+	</Screen>
+	<GamePanel>
+		<Bg>image/bg3.jpg</Bg>
+		<Sound>
+			
+		</Sound>
+		<ActiveScreen> <!-- 실제 게임이 실행되는 화면 -->
+			<Enemies>				
+				<Enemy x="150" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="250" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="350" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="450" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="550" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy5.png"></Enemy>
+				<Enemy x="650" y="200" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy5.png"></Enemy>
+				
+				<Enemy x="450" y="260" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy5.png"></Enemy>
+		
+			</Enemies>
+			<Player>
+				<Obj x="400" y="700" w="80" h="80" life="5" img="image/player2.png"></Obj>
+			</Player>
+			<ShieldBlocks>
+
+			</ShieldBlocks>
+
+			<Items>
+
+				<Item x="810" y="50" w="60" h="60" img="image/shield.png"></Item>
+				<Item x="810" y="50" w="80" h="80" img="image/heart.png"></Item>
+
+			</Items>
+			
+		</ActiveScreen>
+	</GamePanel>
+</MainGame>

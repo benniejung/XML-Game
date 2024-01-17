@@ -171,6 +171,7 @@ class GamePanel extends JPanel implements Runnable{
 	private JLabel lifeTextLabel = new JLabel(new ImageIcon("image/life.png"));
 	JLabel lifeLabel;
 	JLabel scoreLabel;
+	ImageIcon playerBulletIcon;
 
 	// 패널
 	private JPanel topPanel;
@@ -189,7 +190,7 @@ class GamePanel extends JPanel implements Runnable{
 	EnemyShootThread enemyShootTh;
 	ItemThread itemTh;
 	 
-	private boolean stopFlag = true;
+	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	public void setStopFlag() {
 		if(stopFlag==true) {
@@ -227,7 +228,12 @@ class GamePanel extends JPanel implements Runnable{
 				add(player);
 			}
 		}
-		
+		if(player.getIconText().equals("image/spaceship_small.png")) {
+			playerBulletIcon = new ImageIcon("image/bullet.png");
+
+		}else {
+			playerBulletIcon = new ImageIcon("image/player_bullet2.png");
+		}
 		GameManagement.life = player.getLife();
 		
 //		 Enemy노드
@@ -331,8 +337,11 @@ class GamePanel extends JPanel implements Runnable{
 //	 키 이벤트
 	public class GameKeyListener extends KeyAdapter {
 		private BulletThread bulletThread;
-		ImageIcon bulletIcon = new ImageIcon("image/bullet.png");
-		Image bullet = bulletIcon.getImage();
+		ImageIcon bulletIcon1 = new ImageIcon("image/bullet.png");
+		Image bullet1 = bulletIcon1.getImage();
+		ImageIcon bulletIcon2 = new ImageIcon("image/bullet2.png");
+		Image bullet2 = bulletIcon2.getImage();
+
 		@Override
 		public void keyPressed(KeyEvent e) {
 	        int keyCode = e.getKeyCode();
@@ -356,7 +365,7 @@ class GamePanel extends JPanel implements Runnable{
 	                break;
 
 				case KeyEvent.VK_SPACE:
-					PlayerBullet playerBullet = new PlayerBullet(0,0,25,30, bulletIcon);
+					PlayerBullet playerBullet = new PlayerBullet(0,0,25,30, playerBulletIcon);
 	
 					if (bulletThread == null || !bulletThread.isAlive()) {
 						if (playerBullet.getY() <= 0) {
@@ -490,7 +499,7 @@ class EnemyShootThread extends Thread {
     private GameInfoPanel gameInfoPanel;
     private ArrayList<ShieldBlock> shieldBlockArr;
     
-	private boolean stopFlag = true;
+	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	private void setStopFlag() {
 		if(stopFlag==true) {
@@ -515,7 +524,7 @@ class EnemyShootThread extends Thread {
     	for(int i = 0; i<r; i++) {
           int enemyNum = (int) (Math.random() * enemyArr.size());
           Enemy randomEnemy = enemyArr.get(enemyNum);
-          if(randomEnemy.getType().equals("LeftRight")) {
+          if(randomEnemy.getType().equals("LeftRight")||randomEnemy.getType().equals("Free")) {
         	  Bullet bullet = new Bullet(randomEnemy.getX(), randomEnemy.getY(), 40,43, bulletIcon, gamePanel, player, shieldBlockArr, gameInfoPanel);
 //        	  if(GameManagement.stopFlag == true) {
 //        		  bullet.setStopFlag();
@@ -561,7 +570,7 @@ class ItemThread extends Thread {
 	private GamePanel gamePanel;
 	private ArrayList<Label> itemArr;
 	private ArrayList<Label> activeItem = new ArrayList<Label>();
-	private boolean stopFlag = true;
+	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	private void setStopFlag() {
 		if(stopFlag==true) {
@@ -659,12 +668,13 @@ class Player extends JLabel {
 	Image img;
 	private int x,y,w,h;
 	private int life;
+	private ImageIcon icon;
 	public Player(int x, int y, int w, int h, int life,ImageIcon icon) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
 		this.h = h;
-		
+		this.icon = icon;
 		this.setIcon(icon);
 		this.setBounds(this.getX(), y,w,h);
 		this.life = life;
@@ -673,7 +683,7 @@ class Player extends JLabel {
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
 	}
-
+	public String getIconText() {return icon.getDescription();}
 	public int getX() {return x;}
 	public int getY() {return y;}
 	public void setX(int newX) {x = newX;}
