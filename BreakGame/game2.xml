@@ -5,47 +5,30 @@
 	</Screen>
 	<GamePanel>
 		<Bg>image/bg2.jpg</Bg>
-		<Sound>
-			
-		</Sound>
+		<Sound>background1</Sound>
 		<ActiveScreen> <!-- 실제 게임이 실행되는 화면 -->
 			<Enemies>
-				<Enemy x="150" y="75" w="350" h="350" type = "Boss" life = "50" speed = "2" img="image/enemy3.png"></Enemy>
+				<Enemy x="150" y="0" w="350" h="300" type = "Boss" life = "50" speed = "2" img="image/enemy3.png"></Enemy>
 				
-				<Enemy x="550" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy2.png"></Enemy>
-				<Enemy x="650" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy2.png"></Enemy>
+				<Enemy x="550" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="650" y="250" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="550" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="500" y="250" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="150" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="250" y="250" w="42" h="55" type = "RightLeft" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="350" y="250" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="450" y="320" w="42" h="55" type = "RightLeft" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="200" y="320" w="42" h="55" type = "LeftRight" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
+				<Enemy x="650" y="320" w="42" h="55" type = "RightLeft" life = "2" speed = "2" img="image/enemy7.png"></Enemy>
 						
 			</Enemies>
 			<Player>
-				<Obj x="400" y="700" w="40" h="60" life="5" img="image/spaceship_small.png"></Obj>
+				<Obj x="400" y="700" w="40" h="60" life="5" img="image/player3.png"></Obj>
 			</Player>
 			<ShieldBlocks>
-				<ShieldBlock x="115" y="630" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="150" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="180" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="205" y="630" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="150" y="630" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="180" y="630" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="115" y="655" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="205" y="655" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				
-				<ShieldBlock x="310" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="340" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="395" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="395" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="340" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="370" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="310" y="650" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="395" y="650" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-
-				<ShieldBlock x="510" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="540" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="595" y="600" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="595" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="540" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="570" y="625" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="510" y="650" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
-				<ShieldBlock x="595" y="650" w="40" h="37" img="image/shield-block.png"></ShieldBlock>
+				<ShieldBlock x="40" y="550" w="150" h="100" type="unbreakable" img="image/shield-block2.png"></ShieldBlock>
+				<ShieldBlock x="312" y="500" w="182" h="102" type="unbreakable" img="image/shield-block2.png"></ShieldBlock>
+				<ShieldBlock x="555" y="550" w="150" h="100" type="unbreakable" img="image/shield-block2.png"></ShieldBlock>
 
 			</ShieldBlocks>
 

@@ -62,7 +62,6 @@ public class MainGame extends JFrame {
 		
 	}	// 스플릿팬 만들기 (영역 만들고 패널 부착)
 	private void makeSplitPane() {
-		
 		JSplitPane hPane = new JSplitPane();
 		hPane.setOrientation(JSplitPane.VERTICAL_SPLIT); // 수평으로 분할
 		hPane.setDividerLocation(50); // 디바이더 초기 위치 설정
@@ -173,6 +172,9 @@ class GamePanel extends JPanel implements Runnable{
 	JLabel scoreLabel;
 	ImageIcon playerBulletIcon;
 
+	// 음악
+	private Music music = null;
+	
 	// 패널
 	private JPanel topPanel;
 	private JPanel activeScreenPanel;
@@ -206,8 +208,13 @@ class GamePanel extends JPanel implements Runnable{
 		addKeyListener(new GameKeyListener());
 		Node bgNode = XMLReader.getNode(gamePanelNode, XMLReader.E_BG);
 		bgImg = new ImageIcon(bgNode.getTextContent());
+		Node soundNode = XMLReader.getNode(gamePanelNode, XMLReader.E_SOUND);
+		music = new Music();
+		music.playAudio(soundNode.getTextContent());
+
 		Node activeScreenNode = XMLReader.getNode(gamePanelNode, XMLReader.E_ACTIVESCREEN);
 		this.gameInfoPanel = gameInfoPanel;
+		
 
 //		 Player노드
 		Node playerNode = XMLReader.getNode(activeScreenNode, XMLReader.E_PLAYER);
@@ -228,10 +235,14 @@ class GamePanel extends JPanel implements Runnable{
 				add(player);
 			}
 		}
-		if(player.getIconText().equals("image/spaceship_small.png")) {
+		if(player.getIconText().equals("image/player.png")) {
 			playerBulletIcon = new ImageIcon("image/bullet.png");
 
-		}else {
+		}
+		else if(player.getIconText().equals("image/player3.png")) {
+			playerBulletIcon = new ImageIcon("image/bullet.png");
+		}
+		else {
 			playerBulletIcon = new ImageIcon("image/player_bullet2.png");
 		}
 		GameManagement.life = player.getLife();
@@ -297,9 +308,10 @@ class GamePanel extends JPanel implements Runnable{
 				int y = Integer.parseInt(XMLReader.getAttr(node, "y"));
 				int w = Integer.parseInt(XMLReader.getAttr(node, "w"));
 				int h = Integer.parseInt(XMLReader.getAttr(node, "h"));
-
+				String type = XMLReader.getAttr(node, "type");
+				
 				ImageIcon icon = new ImageIcon(XMLReader.getAttr(node, "img"));
-				shieldBlock = new ShieldBlock(x,y,w,h,icon);
+				shieldBlock = new ShieldBlock(x,y,w,h,icon,type);
 				shieldBlockArr.add(shieldBlock);
 				add(shieldBlock);
 				
@@ -397,6 +409,8 @@ class GamePanel extends JPanel implements Runnable{
 		
 		public BulletThread(PlayerBullet bullet) {
 			this.bullet = bullet;
+			music.playAudio("shoot");
+
 			//add(bullet);
 		}
 	    @Override
@@ -405,9 +419,10 @@ class GamePanel extends JPanel implements Runnable{
 	    		add(bullet);
 	            bullet.setLocation(bullet.getX(), bullet.getY() - 10);
 	            for (Iterator<Enemy> iterator = enemyArr.iterator(); iterator.hasNext();) {
+	        		
 	                Enemy enemy = iterator.next();
 	                if (bullet.getBounds().intersects(enemy.getBounds())) {
-	                    
+
 	                    handleCollision(enemy, iterator);
 	                    remove(bullet);
                     
@@ -431,6 +446,8 @@ class GamePanel extends JPanel implements Runnable{
 	        if (currentLife > 0) {
 	        	enemy.setLife(currentLife - 1);
 	            if(enemy.getLife() == 0) {
+	            	music.playAudio("die");
+
 	            	remove(enemy);
 		        	it.remove();
 	            }
@@ -524,7 +541,7 @@ class EnemyShootThread extends Thread {
     	for(int i = 0; i<r; i++) {
           int enemyNum = (int) (Math.random() * enemyArr.size());
           Enemy randomEnemy = enemyArr.get(enemyNum);
-          if(randomEnemy.getType().equals("LeftRight")||randomEnemy.getType().equals("Free")) {
+          if(randomEnemy.getType().equals("LeftRight")||randomEnemy.getType().equals("RightLeft") || randomEnemy.getType().equals("Free")) {
         	  Bullet bullet = new Bullet(randomEnemy.getX(), randomEnemy.getY(), 40,43, bulletIcon, gamePanel, player, shieldBlockArr, gameInfoPanel);
 //        	  if(GameManagement.stopFlag == true) {
 //        		  bullet.setStopFlag();
@@ -584,7 +601,7 @@ class ItemThread extends Thread {
 		this.gamePanel = gamePanel;
 		this.itemArr = itemArr;
 	}
-	public void moveItem(Label itemLabel) {
+	public void moveItem(Label itemLabel, int r) {
 		int initialX = itemLabel.getX();
 		int randomX = (int)(Math.random()*gamePanel.getWidth());
 		int randomY = (int)(Math.random()*301+100);
@@ -594,6 +611,20 @@ class ItemThread extends Thread {
         while (itemLabel.getY()<= gamePanel.getHeight()) { // 아이템이 패널의 높이에 도달할 때까지 떨어진다
 			
 			itemLabel.setXY(itemLabel.getX(), itemLabel.getY()+10);
+            // 생명아이템이 player에 닿았을 때
+			if(r>=1 && r<3) {
+	            if (itemLabel.getBounds().intersects(player.getBounds())) {
+	            	Music item = new Music();
+	            	item.playAudio("item");
+	            	int newLife = GameManagement.life +1;
+	            	gameInfoPanel.setLifeLabel(newLife);
+	            	GameManagement.life = newLife;
+	                gamePanel.remove(itemLabel);
+	                System.out.println("plus"+GameManagement.life);
+	            } 
+
+			}
+
 			gamePanel.repaint();
 	        try {
 	            Thread.sleep(30);
@@ -630,11 +661,11 @@ class ItemThread extends Thread {
 			// 40%확률로 아이템 생성
 			if(r>=3 && r<5) {
 				itemLabel = itemArr.get(0);
-				moveItem(itemLabel);
+				moveItem(itemLabel,r);
 			}
-			else if(r>=1 && r<3) {
+			else if(r>=1 && r<3) { // 생명아이템
 				itemLabel = itemArr.get(1);
-				moveItem(itemLabel);
+				moveItem(itemLabel,r);
 			}
 			
 	        try {
@@ -652,17 +683,19 @@ class ItemThread extends Thread {
 // 클래스들
 class ShieldBlock extends JLabel {
 	Image img;
-	public ShieldBlock(int x, int y, int w, int h, ImageIcon icon) {
+	private String type;
+	public ShieldBlock(int x, int y, int w, int h, ImageIcon icon, String type) {
 
 		this.setIcon(icon);
 		this.setBounds(x,y,w,h);
+		this.type = type;
 		img = icon.getImage();
 	}
 	
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
 	}
-
+	public String getType() {return type;}
 }
 class Player extends JLabel {
 	Image img;

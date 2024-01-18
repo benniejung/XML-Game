@@ -71,16 +71,25 @@ public class Bullet extends JLabel implements Runnable{
 //                if(player.getLife() == 0) {
 //                	bulletThread.interrupt();
 //                }
-                return; 
+                return;
             }
             Iterator<ShieldBlock> iterator = shieldBlockArr.iterator();
             while (iterator.hasNext()) {
                 ShieldBlock shieldBlock = iterator.next();
-                if (this.getBounds().intersects(shieldBlock.getBounds())) {
-                    iterator.remove(); // Use iterator's remove method
-                    gamePanel.remove(shieldBlock);
-                    gamePanel.remove(this);
-                    return;
+                if(shieldBlock.getType().equals("breakable")) {
+                    if (this.getBounds().intersects(shieldBlock.getBounds())) {
+                        iterator.remove(); // Use iterator's remove method
+                        gamePanel.remove(shieldBlock);
+                        gamePanel.remove(this);
+                        return;
+                    }
+
+                } else {
+                    if (this.getBounds().intersects(shieldBlock.getBounds())) {
+                        gamePanel.remove(this);
+                        return;
+                    }
+
                 }
             }
 			try { 

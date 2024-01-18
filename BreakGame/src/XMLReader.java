@@ -26,6 +26,7 @@ public class XMLReader {
 	static public String E_STARTPANEL = "StartPanel";
 	static public String E_GAMEPANEL = "GamePanel";
 	static public String E_BG ="Bg";
+	static public String E_SOUND ="Sound";
 	static public String E_LABEL ="Label";
 	static public String E_SIZE = "Size";
 	static public String E_OBJ = "Obj";
@@ -47,6 +48,7 @@ public class XMLReader {
 	private Node mainGameElement = null;
 	private Node gamePanelElement = null;
 	private Node activeScreenElement = null;
+	private Node soundElement = null;
 	
 	public Node getStartFrameElement() {return startFrameElement;}
 	public Node getScreenElement() {return screenElement;}
@@ -55,7 +57,8 @@ public class XMLReader {
 	public Node getMainGameElement() {return mainGameElement;}
 	public Node getGamePanelElement() {return gamePanelElement;}
 	public Node getActiveScreenElement() {return activeScreenElement;}
-	
+	public Node getSoundElement() {return soundElement;}
+
 	private PrintWriter out;
 	
 	public XMLReader(String XMLFile) {
@@ -145,8 +148,8 @@ public class XMLReader {
 		    }
 		    else if(node.getNodeName().equals(E_OBJ)) {
 			}
-		    else if(node.getNodeName().equals(E_ENEMY)) {
-		
+		    else if(node.getNodeName().equals(E_SOUND)) {
+		    	soundElement = node;
 			}
 			printNode(node);
 			process(node); // recursion

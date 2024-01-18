@@ -134,7 +134,7 @@ public class Enemy extends JLabel implements Runnable{
 //			int directionY = (int)(Math.random()*2 +1);
 //			int ranX = (int)(Math.random()*40);
 //			int ranY = (int)(Math.random()*40);
-			
+			 
 			if(loopN == 20*n) {
 				int newY = this.getY()+20;
 				this.setLocation(this.getX(), newY);
