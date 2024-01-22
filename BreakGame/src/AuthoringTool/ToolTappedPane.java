@@ -21,8 +21,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ToolTappedPane extends JTabbedPane{
-	public ToolTappedPane() {
-		this.addTab("Bg", new BackgroundPanel());
+	DrawPanel drawPanel;
+	public ToolTappedPane(DrawPanel drawPanel) {
+		this.drawPanel = drawPanel;
+		
+		this.addTab("Bg", new BackgroundPanel(drawPanel));
 		this.addTab("Sound", new SoundPanel());
 		this.addTab("Enemy", new EnemyPanel());
 		this.addTab("Player", new PlayerPanel());
@@ -33,12 +36,13 @@ public class ToolTappedPane extends JTabbedPane{
 
 class BackgroundPanel extends JPanel {
 	private JButton bgButton;
-	//private MyButton bgButton;
+	private JButton selectedButton;
 	private String[] imgs = {"image/background/bg1.jpg", "image/background/bg2.jpg","image/background/bg3.jpg","image/background/bg4.jpg","image/background/bg5.jpg"};
 	int btnSize = 100;
-	
-	public BackgroundPanel() {
+	DrawPanel drawPanel;
+	public BackgroundPanel(DrawPanel drawPanel) {
 		this.setLayout(new BorderLayout());
+		this.drawPanel = drawPanel;
 		JPanel BgBoxPanel = new JPanel();
 		this.add(BgBoxPanel,BorderLayout.CENTER);
 		BgBoxPanel.setBorder(new TitledBorder(new EtchedBorder(),"Background"));
@@ -46,8 +50,10 @@ class BackgroundPanel extends JPanel {
 			ImageIcon icon = new ImageIcon(imgs[i]);
 			Image img = icon.getImage();
 			Image updateImg = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH); // 이미지 버튼크기에 맞게 조절
+			ImageIcon updateIcon = new ImageIcon(updateImg);
+			updateIcon.setDescription(imgs[i]);
 			
-			bgButton = new JButton(new ImageIcon(updateImg));
+			bgButton = new JButton(updateIcon);
 			bgButton.setPreferredSize(new Dimension(100,100));
 			BgBoxPanel.add(bgButton);
 			bgButton.addActionListener(new actionEvent());
@@ -111,10 +117,17 @@ class BackgroundPanel extends JPanel {
 	}
 	// 배경 눌렀을 때 이벤트
 	class actionEvent implements ActionListener {
-		private Cursor cursor;
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			JButton b = (JButton) e.getSource();
+			selectedButton = b;
 			
+			System.out.println(((ImageIcon) b.getIcon()).getDescription());
+			String imageDescription = ((ImageIcon) b.getIcon()).getDescription();
+			
+			drawPanel.setBgIcon(new ImageIcon(imageDescription));
+			drawPanel.repaint();
+
 		}
 	}
 }

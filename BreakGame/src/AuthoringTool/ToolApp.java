@@ -6,5 +6,4 @@ public class ToolApp {
 		AuthoringFrame authoringFrame = new AuthoringFrame();
 
 	}
-
 }
