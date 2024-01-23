@@ -26,10 +26,10 @@ public class ToolTappedPane extends JTabbedPane{
 		this.drawPanel = drawPanel;
 		
 		this.addTab("Bg", new BackgroundPanel(drawPanel));
-		this.addTab("Sound", new SoundPanel());
-		this.addTab("Enemy", new EnemyPanel());
-		this.addTab("Player", new PlayerPanel());
-		this.addTab("ShieldBlock", new ShieldBlockPanel());
+		this.addTab("Sound", new SoundPanel(drawPanel));
+		this.addTab("Enemy", new EnemyPanel(drawPanel));
+		this.addTab("Player", new PlayerPanel(drawPanel));
+		this.addTab("ShieldBlock", new ShieldBlockPanel(drawPanel));
 		this.addTab("Item", new ItemPanel());
 	}
 }
@@ -131,27 +131,7 @@ class BackgroundPanel extends JPanel {
 		}
 	}
 }
-class SoundPanel extends JPanel {
-	public SoundPanel() {
-		
-	}
-}
-class EnemyPanel extends JPanel {
-	public EnemyPanel() {
-		
-	}
-}
 
-class PlayerPanel extends JPanel {
-	public PlayerPanel() {
-		
-	}
-}
-class ShieldBlockPanel extends JPanel {
-	public ShieldBlockPanel() {
-		
-	}
-}
 class ItemPanel extends JPanel {
 	public ItemPanel() {
 		
