@@ -27,10 +27,11 @@ public class ToolTappedPane extends JTabbedPane{
 		
 		this.addTab("Bg", new BackgroundPanel(drawPanel));
 		this.addTab("Sound", new SoundPanel(drawPanel));
-		this.addTab("Enemy", new EnemyPanel(drawPanel));
-		this.addTab("Player", new PlayerPanel(drawPanel));
-		this.addTab("ShieldBlock", new ShieldBlockPanel(drawPanel));
-		this.addTab("Item", new ItemPanel());
+		this.addTab("Obj", new ObjPanel(drawPanel));
+//		this.addTab("Enemy", new EnemyPanel(drawPanel));
+//		this.addTab("Player", new PlayerPanel(drawPanel));
+//		this.addTab("ShieldBlock", new ShieldBlockPanel(drawPanel));
+//		this.addTab("Item", new ItemPanel());
 	}
 }
 
@@ -103,10 +104,13 @@ class BackgroundPanel extends JPanel {
 			// 파일을 선택한 경우
 			if (chooser.getSelectedFile() != null) {
 				String filePath = chooser.getSelectedFile().getPath();
+				System.out.println("choose filePath: " + filePath);
 				ImageIcon icon = new ImageIcon(filePath);
 				Image img = icon.getImage();
 				Image updateImg = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH); // 이미지 버튼크기에 맞게 조절
-				JButton addImgButton = new JButton(new ImageIcon(updateImg));
+				ImageIcon updateIcon = new ImageIcon(updateImg);
+				updateIcon.setDescription(filePath);
+				JButton addImgButton = new JButton(updateIcon);
 				addImgButton.setPreferredSize(new Dimension(100,100));
 				addImgButton.addActionListener(new actionEvent());
 				BgBoxPanel.add(addImgButton);
@@ -131,7 +135,6 @@ class BackgroundPanel extends JPanel {
 		}
 	}
 }
-
 class ItemPanel extends JPanel {
 	public ItemPanel() {
 		
