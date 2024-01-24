@@ -29,6 +29,7 @@ public class ShieldBlockPanel extends JPanel{
 	JPanel imgsPanel = new JPanel();
 	private String[] imgs = {"image/shield-block.png", "image/shield-block2.png"};
 	JButton enemyButton;
+	
 	public ShieldBlockPanel(DrawPanel drawPanel) {
 		this.drawPanel = drawPanel;
 		setLayout(null);
