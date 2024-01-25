@@ -47,11 +47,13 @@ class DrawPanel extends JPanel{
 	public void setBgIcon(ImageIcon bgIcon) {
 		this.bgIcon = bgIcon;
 	}
+	public ImageIcon getBgIcon() {
+		return bgIcon;
+	}
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if(bgIcon != null) {
-			System.out.println("draw: " + bgIcon.getDescription());
 			g.drawImage(bgIcon.getImage(), 0, 0,this.getWidth(),this.getHeight(), this);
 
 		}

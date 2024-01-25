@@ -21,7 +21,7 @@ public class Object extends JLabel{
 		this.icon = icon;
 		setIcon(icon);
 		img = icon.getImage();
-		setBounds(x,y,w,h);
+		this.setBounds(x,y,w,h);
 	}
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
@@ -86,11 +86,22 @@ class EnemyObj extends Object {
 		this.life = life;
 		
 	}
+	public int getLife() {return life;}
 	public String getType() {return type;}
 	public int getSpeed() {return speed;}
+	
+	public void setLife(int newLife) {life = newLife;}
+	public void setType(String newType) {type = newType;}
+	public void setSpeed(int newSpeed) {speed = newSpeed;}
+}
+class PlayerObj extends Object {
+	private int life;
+	public PlayerObj(int x, int y, int w, int h, int life, ImageIcon icon) {
+		super(x,y,w,h,icon);
+		this.life = life;
+		
+	}
 	public int getLife() {return life;}
 	
-	public void setType(String newType) { type = newType;}
-	public void setSpeed(int newSpeed) {speed = newSpeed;}
 	public void setLife(int newLife) {life = newLife;}
 }

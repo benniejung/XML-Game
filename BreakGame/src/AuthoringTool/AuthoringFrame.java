@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -15,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AuthoringFrame extends JFrame {
 	Container c;
@@ -45,6 +48,7 @@ public class AuthoringFrame extends JFrame {
 		JMenuItem saveFileItem = new JMenuItem("Save");
 		
 		newFileItem.addActionListener(new newFileActionListener());
+		saveFileItem.addActionListener(new saveFileActionListener());
 		File.add(newFileItem);
 		File.add(openFileItem);
 		File.add(saveFileItem);
@@ -79,6 +83,43 @@ public class AuthoringFrame extends JFrame {
 			c.revalidate();
 		}
 
+	}
+	class saveFileActionListener implements ActionListener {
+		private JFileChooser chooser;
+		
+		public saveFileActionListener() {
+			chooser = new JFileChooser("C:\\Users\\User\\git\\XML-Game\\BreakGame"); // 해당 경로에서 파일 찾기
+
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("XML", "xml");
+			chooser.setFileFilter(filter); // xml파일만 선택할 수 있음
+			int ret = chooser.showSaveDialog(drawPanel);
+			if (ret != JFileChooser.APPROVE_OPTION) {
+				JOptionPane.showMessageDialog(null, "파일을 저장해주세요", "파일 저장", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			String imageDescription = ((ImageIcon) drawPanel.getBgIcon()).getDescription();
+			if (chooser.getSelectedFile() != null) {
+				String filePath = chooser.getSelectedFile().getPath();
+				XMLFile file = new XMLFile(filePath);
+				
+				String text = "<MainGame>\n<Screen>\n<Size w= \""+ sizePanel.getW()+"\""+" h=\""+sizePanel.getH()+"\""+"></Size>\n";
+				text+="</Screen>\n";
+				text+="<GamePanel>\n<Bg>"+imageDescription+"</Bg>\n";
+				text+="<Sound>"+"</Sound>\n"; // 사운드!!
+				
+				
+				text+="</GamePanel>\n</MainGame>";
+				file.writeFile(text, XMLFile.file);
+				
+				
+
+			}
+
+
+		}
 	}
 }
 

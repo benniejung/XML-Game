@@ -61,6 +61,7 @@ public class EnemyPanel extends JPanel{
 	Vector<EnemyObj> enemys = new Vector<EnemyObj>();
 	// 패널에서 클릭한 오브젝트
 	EnemyObj clickedEnemy;
+	PolygonObj rect;
 	public EnemyPanel(DrawPanel drawPanel) {
 		this.drawPanel = drawPanel;
 		setLayout(null);
@@ -127,7 +128,7 @@ public class EnemyPanel extends JPanel{
 		typeLabel.setBounds(30,500,100,20);
 		typeCombo = new JComboBox(typeList);
 		typeCombo.setBounds(70,500,100,20);
-		typeCombo.addKeyListener(new settingKeyListener("typeCombo"));
+		typeCombo.addActionListener(new ComboListener("typeCombo"));
 		
 		lifeLabel = new JLabel("Life");
 		lifeLabel.setBounds(200,500,100,20);
@@ -139,8 +140,7 @@ public class EnemyPanel extends JPanel{
 		speedLabel.setBounds(30,550,100,20);
 		speedCombo = new JComboBox(speedList);
 		speedCombo.setBounds(70,550,100,20);
-		speedCombo.addKeyListener(new settingKeyListener("speedCombo"));
-		
+		speedCombo.addActionListener(new ComboListener("speedCombo"));
 		
 		add(xLabel);
 		add(yLabel);
@@ -161,7 +161,12 @@ public class EnemyPanel extends JPanel{
 		drawPanel.requestFocusInWindow();
 		drawPanel.addMouseListener(new DrawMouseListener());
 		drawPanel.addMouseMotionListener(new DrawMouseListener());
-		drawPanel.addKeyListener(new settingKeyListener(drawPanel));
+		drawPanel.addKeyListener(new deleteKeyListener());
+		if(clickedEnemy !=null) {
+			clickedEnemy.setFocusable(true);
+			clickedEnemy.requestFocusInWindow();
+			clickedEnemy.addKeyListener(new deleteKeyListener());
+		}
 		
 		clickedDrawPanel = false;
 		System.out.println(clickedDrawPanel);
@@ -201,15 +206,55 @@ public class EnemyPanel extends JPanel{
 				imgsPanel.add(addImgButton);
 				
 			}
-
+		}
+	}
+	class deleteKeyListener extends KeyAdapter{
+		@Override
+		public void keyPressed(KeyEvent e) {
+			int keyCode = e.getKeyCode();
+			switch(keyCode) {
+			case KeyEvent.VK_BACK_SPACE:
+				drawPanel.remove(rect);
+				System.out.println("remove");
+				drawPanel.remove(clickedEnemy);
+				enemys.remove(clickedEnemy);
+				drawPanel.repaint();
+				break;
+			}
+		}
+	}
+	// 콤보박스 이벤트
+	class ComboListener implements ActionListener{
+		private String comboBox;
+		public ComboListener(String comboBox) {
+			this.comboBox = comboBox;
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JComboBox source = (JComboBox)e.getSource();
+			int index;
+			switch(comboBox) {
+			case "typeCombo":
+				if(clickedEnemy !=null) {
+					index = source.getSelectedIndex();
+					String type = typeList[index];
+					clickedEnemy.setType(type);
+				}
+				break;
+			case "speedCombo":
+				if(clickedEnemy !=null) {
+					index = source.getSelectedIndex();
+					int speed = Integer.parseInt(speedList[index]);
+					clickedEnemy.setSpeed(speed);		
+				}
+				break;
+			}
 		}
 	}
 	class settingKeyListener extends KeyAdapter{
 		String changedSetting;
-		DrawPanel drawPanel;
-		public settingKeyListener(DrawPanel drawPanel) {
-			this.drawPanel = drawPanel;
-		}
+//		DrawPanel drawPanel;
+		public settingKeyListener() {}
 		public settingKeyListener(String changedSetting) {
 			this.changedSetting = changedSetting;
 		}
@@ -218,65 +263,48 @@ public class EnemyPanel extends JPanel{
 			int keyCode = e.getKeyCode();
 			switch(keyCode) {
 			case KeyEvent.VK_ENTER:
-				enemys.remove(clickedEnemy);
+				//enemys.remove(clickedEnemy);
 				if(changedSetting.equals("xTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int x = Integer.parseInt(textField.getText());
+					clickedEnemy.setLocation(x,clickedEnemy.getY());
 					clickedEnemy.setX(x);
 				} else if(changedSetting.equals("yTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int y = Integer.parseInt(textField.getText());
+					clickedEnemy.setLocation(clickedEnemy.getX(),y);
 					clickedEnemy.setY(y);
 				} else if(changedSetting.equals("wTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int w = Integer.parseInt(textField.getText());
+					clickedEnemy.setSize(w,clickedEnemy.getH());
 					clickedEnemy.setW(w);
 				} else if(changedSetting.equals("hTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int h = Integer.parseInt(textField.getText());
+					clickedEnemy.setSize(clickedEnemy.getW(),h);
 					clickedEnemy.setH(h);
+				} else if(changedSetting.equals("lifeTextField")) {
+					JTextField textField = (JTextField)e.getSource();
+					int life = Integer.parseInt(textField.getText());
+					clickedEnemy.setLife(life);
 				}
-					
-//				Component source = (Component) e.getSource();
-//                if (source instanceof JTextField) {
-//                    JTextField textField = (JTextField) source;
-//                    System.out.println("Entered text in JTextField: " + textField.getText());
-//                } else if (source instanceof JComboBox) {
-//                    JComboBox comboBox = (JComboBox) source;
-//                    System.out.println("Selected item in JComboBox: " + comboBox.getSelectedItem());
-//                } 
+				drawPanel.remove(rect);
 				drawPanel.repaint();
 				enemys.add(clickedEnemy);
 
                 break;
 			case KeyEvent.VK_BACK_SPACE:
 				System.out.println("remove");
+				drawPanel.remove(rect);
 				drawPanel.remove(clickedEnemy);
 				enemys.remove(clickedEnemy);
 				drawPanel.repaint();
+				
 				break;
 			}
 			
 		}
-		   @Override
-		    public void keyReleased(KeyEvent e) {
-		        int keyCode = e.getKeyCode();
-		        switch (keyCode) {
-		            case KeyEvent.VK_BACK_SPACE:
-		                System.out.println("remove");
-		                drawPanel.remove(clickedEnemy);
-		                enemys.remove(clickedEnemy);
-		                drawPanel.repaint();
-		                break;
-		        }
-		    }
-		   @Override
-		   public void keyTyped(KeyEvent e) {
-		       char keyChar = e.getKeyChar();
-		       if (keyChar == '\b') { // Check for backspace character
-		           System.out.println("Backspace pressed");
-		       }
-		   }
 	}
 
 	//enemy사진 눌렀을때 이벤트
@@ -315,22 +343,32 @@ public class EnemyPanel extends JPanel{
 		                clickedEnemyObj = true;
 		                System.out.println("find");
 		                clickedEnemy = enemys.get(i);
+		                
 		                int x1 = clickedEnemy.getX();
 		                int y1 = clickedEnemy.getY();
 		                int x2 = x1 + clickedEnemy.getWidth();
 		                int y2 = y1 + clickedEnemy.getHeight();
-		                
+		                // 선택한 것만 박스 그려지도록
 		                for (Component component : drawPanel.getComponents()) {
 		                    if (component instanceof PolygonObj) {
 		                        drawPanel.remove((PolygonObj) component);
 		                    }
 		                }
-		                PolygonObj rect = new PolygonObj(x1, y1, x2, y2);
+		                rect = new PolygonObj(x1, y1, x2, y2);
 		                drawPanel.add(rect);
 		                drawPanel.repaint();
 		                
 //		    			Cursor ne_cursor = new Cursor(Cursor.NE_RESIZE_CURSOR);
 //		    			drawPanel.setCursor(ne_cursor);
+		                
+						xTextField.setText(Integer.toString(clickedEnemy.getX()));
+						yTextField.setText(Integer.toString(clickedEnemy.getY()));
+						wTextField.setText(Integer.toString(clickedEnemy.getWidth()));
+						hTextField.setText(Integer.toString(clickedEnemy.getHeight()));
+						lifeTextField.setText(Integer.toString(clickedEnemy.getLife()));
+						typeCombo.setSelectedItem(clickedEnemy.getType());
+						speedCombo.setSelectedItem(clickedEnemy.getSpeed());
+
 		                return; // 해당 객체와 일치하는 경우 커서를 설정하고 메서드를 종료
 		            }	
 		     }
@@ -358,7 +396,12 @@ public class EnemyPanel extends JPanel{
 				yTextField.setText(Integer.toString(y));
 				wTextField.setText(Integer.toString(w));
 				hTextField.setText(Integer.toString(h));
-
+				lifeTextField.setText(Integer.toString(life));
+//				String getSelectedItem = (String)typeCombo.getSelectedItem();
+//				getSelectedItem = type;
+//				typeCombo.setSelectedItem(getSelectedItem);
+				typeCombo.setSelectedItem(type);
+				speedCombo.setSelectedItem(Integer.toString(speed));
 			}
 
 		}
@@ -401,7 +444,17 @@ public class EnemyPanel extends JPanel{
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			// TODO Auto-generated method stub
+			drawPanel.remove(rect);
+			int x = e.getX();
+			int y = e.getY();
+			clickedEnemy.setLocation(x,y);
+			clickedEnemy.setX(x);
+			clickedEnemy.setY(y);
+			drawPanel.repaint();
+			
+			// 속성필드 값변경
+			xTextField.setText(Integer.toString(x));
+			yTextField.setText(Integer.toString(y));
 			
 		}
 	}
