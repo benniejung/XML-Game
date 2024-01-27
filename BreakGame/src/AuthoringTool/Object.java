@@ -5,14 +5,17 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-public class Object extends JLabel{
+public abstract class Object extends JLabel{
 	private int x,y,w,h;
-	private ImageIcon icon;
+	ImageIcon icon;
 	Image img;
+	abstract public String toString();
+	public Object() {}
 	public Object(int x, int y, int w, int h, ImageIcon icon) { 
 		this.x = x;
 		this.y = y;
@@ -23,6 +26,7 @@ public class Object extends JLabel{
 		img = icon.getImage();
 		this.setBounds(x,y,w,h);
 	}
+	
 	public void paintComponent(Graphics g) {
 		g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
 	}
@@ -79,12 +83,30 @@ class PolygonObj extends JLabel {
 class EnemyObj extends Object {
 	private String type;
 	private int speed,life;
+	static Vector<EnemyObj> enemys = new Vector<EnemyObj>();
+	public EnemyObj() {}
 	public EnemyObj(int x, int y, int w, int h, String type, int speed, int life, ImageIcon icon) {
 		super(x,y,w,h,icon);
 		this.type = type;
 		this.speed = speed;
 		this.life = life;
 		
+	}
+	@Override
+	public String toString() {
+		System.out.println(enemys.size());
+		String text = "<Enemies>\n";
+		for(int i =0; i<enemys.size(); i++) {
+			EnemyObj enemy = enemys.get(i);
+			String iconDescription = enemy.icon.getDescription();
+			text+= "<Enemy x=\""+enemy.getX()+"\" y=\""+enemy.getY()+"\" w=\""+enemy.getW()+"\" h=\""+enemy.getH()+"\"";
+			text+= " type=\""+enemy.getType()+"\" speed=\""+enemy.getSpeed()+"\" life=\""+enemy.getLife()+"\"";
+			text+= " icon=\""+iconDescription+"\"></Enemy>\n";
+			
+
+		}
+		text+="</Enemies>\n";
+		return text;
 	}
 	public int getLife() {return life;}
 	public String getType() {return type;}
@@ -100,6 +122,11 @@ class PlayerObj extends Object {
 		super(x,y,w,h,icon);
 		this.life = life;
 		
+	}
+	@Override
+	public String toString() {
+		String text="";
+		return text;
 	}
 	public int getLife() {return life;}
 	

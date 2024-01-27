@@ -1,10 +1,13 @@
 package AuthoringTool;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -75,14 +78,15 @@ public class AuthoringFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			JOptionPane.showMessageDialog(null, sizePanel, "게임메인화면 크기 지정", JOptionPane.PLAIN_MESSAGE);
 			sizePanel.setSize();
-			drawPanel = new DrawPanel(sizePanel.getW(),sizePanel.getH());
+			drawPanel = new DrawPanel(sizePanel.getW(),sizePanel.getH(), mainPanel);
 			drawPanel.setLocation(0,0);
 			mainPanel.add(drawPanel);
-			toolTappedPane = new ToolTappedPane(drawPanel);
-			rightPanel.add(toolTappedPane, BorderLayout.CENTER);
+			drawPanel.setBackground(Color.white);
+            toolTappedPane = new ToolTappedPane(mainPanel,drawPanel);
+            rightPanel.add(toolTappedPane, BorderLayout.CENTER);
 			c.revalidate();
+			
 		}
-
 	}
 	class saveFileActionListener implements ActionListener {
 		private JFileChooser chooser;
@@ -109,10 +113,16 @@ public class AuthoringFrame extends JFrame {
 				text+="</Screen>\n";
 				text+="<GamePanel>\n<Bg>"+imageDescription+"</Bg>\n";
 				text+="<Sound>"+"</Sound>\n"; // 사운드!!
-				
-				
-				text+="</GamePanel>\n</MainGame>";
+				text+="<ActiveScreen>\n";
 				file.writeFile(text, XMLFile.file);
+				
+				EnemyObj enemyObj = new EnemyObj();
+				file.writeFile(enemyObj.toString(), XMLFile.file);
+				
+				
+				text ="</ActiveScreen>\n</GamePanel>\n</MainGame>";
+				file.writeFile(text, XMLFile.file);
+
 				
 				
 
