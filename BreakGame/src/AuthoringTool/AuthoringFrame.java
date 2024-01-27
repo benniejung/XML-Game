@@ -105,6 +105,7 @@ public class AuthoringFrame extends JFrame {
 				return;
 			}
 			String imageDescription = ((ImageIcon) drawPanel.getBgIcon()).getDescription();
+			String soundFile = SoundPanel.fileName;
 			if (chooser.getSelectedFile() != null) {
 				String filePath = chooser.getSelectedFile().getPath();
 				XMLFile file = new XMLFile(filePath);
@@ -112,7 +113,7 @@ public class AuthoringFrame extends JFrame {
 				String text = "<MainGame>\n<Screen>\n<Size w= \""+ sizePanel.getW()+"\""+" h=\""+sizePanel.getH()+"\""+"></Size>\n";
 				text+="</Screen>\n";
 				text+="<GamePanel>\n<Bg>"+imageDescription+"</Bg>\n";
-				text+="<Sound>"+"</Sound>\n"; // 사운드!!
+				text+="<Sound>"+soundFile+"</Sound>\n";
 				text+="<ActiveScreen>\n";
 				file.writeFile(text, XMLFile.file);
 				
