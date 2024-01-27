@@ -94,7 +94,6 @@ class EnemyObj extends Object {
 	}
 	@Override
 	public String toString() {
-		System.out.println(enemys.size());
 		String text = "<Enemies>\n";
 		for(int i =0; i<enemys.size(); i++) {
 			EnemyObj enemy = enemys.get(i);
@@ -118,6 +117,8 @@ class EnemyObj extends Object {
 }
 class PlayerObj extends Object {
 	private int life;
+	static Vector<PlayerObj> player = new Vector<PlayerObj>(1); // 플레이어는 한개만 저장하도록
+	public PlayerObj() {};
 	public PlayerObj(int x, int y, int w, int h, int life, ImageIcon icon) {
 		super(x,y,w,h,icon);
 		this.life = life;
@@ -125,10 +126,48 @@ class PlayerObj extends Object {
 	}
 	@Override
 	public String toString() {
-		String text="";
+		String text = "<Player>\n";
+		for(int i =0; i<player.size(); i++) {
+			PlayerObj playerObj = player.get(i);
+			String iconDescription = playerObj.icon.getDescription();
+			text+= "<Obj x=\""+playerObj.getX()+"\" y=\""+playerObj.getY()+"\" w=\""+playerObj.getW()+"\" h=\""+playerObj.getH()+"\"";
+			text+= " life=\""+playerObj.getLife()+"\"";
+			text+= " icon=\""+iconDescription+"\"></Obj>\n";
+			
+
+		}
+		text+="</Player>\n";
 		return text;
 	}
 	public int getLife() {return life;}
 	
 	public void setLife(int newLife) {life = newLife;}
+}
+class ShieldBlockObj extends Object {
+	private String type;
+	static Vector<ShieldBlockObj> shieldBlocks = new Vector<ShieldBlockObj>(); // 플레이어는 한개만 저장하도록
+	public ShieldBlockObj() {};
+	public ShieldBlockObj(int x, int y, int w, int h, String type, ImageIcon icon) {
+		super(x,y,w,h,icon);
+		this.type = type;
+	}
+	@Override
+	public String toString() {
+		String text = "<ShieldBlocks>\n";
+		for(int i =0; i<shieldBlocks.size(); i++) {
+			ShieldBlockObj shieldBlock = shieldBlocks.get(i);
+			String iconDescription = shieldBlock.icon.getDescription();
+			text+= "<ShieldBlock x=\""+shieldBlock.getX()+"\" y=\""+shieldBlock.getY()+"\" w=\""+shieldBlock.getW()+"\" h=\""+shieldBlock.getH()+"\"";
+			text+= " type=\""+shieldBlock.getType()+"\"";
+			text+= " icon=\""+iconDescription+"\"></ShieldBlock>\n";
+			
+
+		}
+		text+="</ShieldBlocks>\n";
+		return text;
+	}
+	public String getType() {return type;}
+	
+	public void setType(String newType) {type = newType;}
+
 }

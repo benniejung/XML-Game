@@ -119,6 +119,11 @@ public class AuthoringFrame extends JFrame {
 				EnemyObj enemyObj = new EnemyObj();
 				file.writeFile(enemyObj.toString(), XMLFile.file);
 				
+				PlayerObj playerObj = new PlayerObj();
+				file.writeFile(playerObj.toString(), XMLFile.file);
+				
+				ShieldBlockObj shieldBlockObj = new ShieldBlockObj();
+				file.writeFile(shieldBlockObj.toString(), XMLFile.file);
 				
 				text ="</ActiveScreen>\n</GamePanel>\n</MainGame>";
 				file.writeFile(text, XMLFile.file);

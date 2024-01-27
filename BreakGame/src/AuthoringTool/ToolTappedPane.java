@@ -300,10 +300,10 @@ class BackgroundPanel extends JPanel {
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(EnemyPanel.chooseImg == false) {
-				drawPanel.setLocation(e.getX(),e.getY());
-				mainPanel.repaint();
-			}
+//			if(EnemyPanel.chooseImg == false) {
+//				drawPanel.setLocation(e.getX(),e.getY());
+//				mainPanel.repaint();
+//			}
 			
 		}
 

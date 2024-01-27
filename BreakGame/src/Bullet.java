@@ -1,7 +1,7 @@
 import java.awt.Graphics;
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -12,14 +12,14 @@ public class Bullet extends JLabel implements Runnable{
 	private GamePanel gamePanel;
 	private GameInfoPanel gameInfoPanel;
 	private Player player;
-	private ArrayList<ShieldBlock> shieldBlockArr;
+	private Vector<ShieldBlock> shieldBlockArr;
 	JLabel lifeLabel;
 	private Thread bulletThread;
 	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	public void setStopFlag() {stopFlag = true;}
 
-	public Bullet(int x, int y, int w, int h, ImageIcon icon, GamePanel gamePanel, Player player, ArrayList shieldBlockArr, GameInfoPanel gameInfoPanel) {
+	public Bullet(int x, int y, int w, int h, ImageIcon icon, GamePanel gamePanel, Player player, Vector<ShieldBlock> shieldBlockArr, GameInfoPanel gameInfoPanel) {
 
 		this.setBounds(x, y,w,h);
 		this.y = y;
@@ -78,7 +78,7 @@ public class Bullet extends JLabel implements Runnable{
                 ShieldBlock shieldBlock = iterator.next();
                 if(shieldBlock.getType().equals("breakable")) {
                     if (this.getBounds().intersects(shieldBlock.getBounds())) {
-                        iterator.remove(); // Use iterator's remove method
+                        iterator.remove();
                         gamePanel.remove(shieldBlock);
                         gamePanel.remove(this);
                         return;

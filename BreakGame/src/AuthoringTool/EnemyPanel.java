@@ -164,7 +164,7 @@ public class EnemyPanel extends JPanel{
 		drawPanel.requestFocusInWindow();
 		drawPanel.addMouseListener(new DrawMouseListener());
 		drawPanel.addMouseMotionListener(new DrawMouseListener());
-		drawPanel.addKeyListener(new deleteKeyListener());
+
 		if(clickedEnemy !=null) {
 			clickedEnemy.setFocusable(true);
 			clickedEnemy.requestFocusInWindow();
