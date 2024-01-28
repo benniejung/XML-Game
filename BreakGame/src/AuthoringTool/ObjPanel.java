@@ -16,11 +16,13 @@ public class ObjPanel extends JPanel {
 	private PlayerPanel playerPanel;
 	private ShieldBlockPanel shieldBlockPanel;
 	private JPanel selectedObjPanel;
+	static String selectedItem = "Enemy";
+	static JComboBox<String> objCombo;
 	public ObjPanel(DrawPanel drawPanel) {
 		this.drawPanel = drawPanel;
         setLayout(new BorderLayout());
 
-        JComboBox<String> objCombo = new JComboBox<String>();
+        objCombo = new JComboBox<String>();
         for (int i = 0; i < objects.length; i++) {
             objCombo.addItem(objects[i]);
         }
@@ -48,10 +50,10 @@ public class ObjPanel extends JPanel {
 			JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
 
             // 선택된 아이템 가져오기
-            String selectedObj = (String) comboBox.getSelectedItem();
+			selectedItem = (String) comboBox.getSelectedItem();
             
             CardLayout cardLayout = (CardLayout) selectedObjPanel.getLayout();
-            switch (selectedObj) {
+            switch (selectedItem) {
             case "Enemy":
                 selectedObjPanel.add("EnemyPanel", enemyPanel);
                 cardLayout.show(selectedObjPanel, "EnemyPanel");

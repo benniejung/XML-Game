@@ -53,10 +53,14 @@ public class EnemyPanel extends JPanel{
 	
 	// 오브젝트 생성할 때 필요한 것들
 	JButton clickedBtn;
-	EnemyObj enemyObj;
-	private String imagePath;
+	EnemyObj enemyObj, selectedEnemy;
+	PlayerObj playerObj, selectedPlayer;
+	
+	static String imagePath;
 	private boolean clickedDrawPanel = false;
 	static boolean chooseImg = false;
+	String clickedObj = null;
+	boolean hasBorder = false;
 	// 생성된 오브젝트 저장하는 벡터
 //	Vector<EnemyObj> enemys = new Vector<EnemyObj>();
 	
@@ -314,7 +318,7 @@ public class EnemyPanel extends JPanel{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JButton clickedBtn = (JButton)e.getSource();
+			clickedBtn = (JButton)e.getSource();
 			clickedBtn.setBorder(BorderFactory.createLineBorder(Color.red,5)); // 어떤 사진을 클릭했는지 알 수 있도록 border주기
 			// 하나의 사진만 Border를 가질 수 있게
 	        for (Component component : imgsPanel.getComponents()) {
@@ -338,57 +342,86 @@ public class EnemyPanel extends JPanel{
 		@Override
 		public void mousePressed(MouseEvent e) {
 			clickedDrawPanel = true;
-			boolean clickedEnemyObj = false;
-			if(chooseImg == true) { // 이미지를 선택했을 경우, 패널에 그리거나 이미 있던 오브젝트 선택
-				for(int i =0; i<EnemyObj.enemys.size(); i++) {
-			           Point p = e.getPoint();
-			           Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
-			            if (enemyBounds.contains(p)) {
-			                clickedEnemyObj = true;
-			                System.out.println("find");
-			                clickedEnemy = EnemyObj.enemys.get(i);
-			                
-			                int x1 = clickedEnemy.getX();
-			                int y1 = clickedEnemy.getY();
-			                int x2 = x1 + clickedEnemy.getWidth();
-			                int y2 = y1 + clickedEnemy.getHeight();
-			                // 선택한 것만 박스 그려지도록
-			                for (Component component : drawPanel.getComponents()) {
-			                    if (component instanceof PolygonObj) {
-			                        drawPanel.remove((PolygonObj) component);
-			                    }
-			                }
-			                rect = new PolygonObj(x1, y1, x2, y2);
-			                drawPanel.add(rect);
-			                drawPanel.repaint();
-			                
-//			    			Cursor ne_cursor = new Cursor(Cursor.NE_RESIZE_CURSOR);
-//			    			drawPanel.setCursor(ne_cursor);
-			                
-							xTextField.setText(Integer.toString(clickedEnemy.getX()));
-							yTextField.setText(Integer.toString(clickedEnemy.getY()));
-							wTextField.setText(Integer.toString(clickedEnemy.getWidth()));
-							hTextField.setText(Integer.toString(clickedEnemy.getHeight()));
-							lifeTextField.setText(Integer.toString(clickedEnemy.getLife()));
-							typeCombo.setSelectedItem(clickedEnemy.getType());
-							speedCombo.setSelectedItem(clickedEnemy.getSpeed());
+			boolean clickedExistedObj = false; // 새로 생성 여부를 정하기 위한 변수
+			Object obj = null;
+			int x1,y1,x2,y2;
+			Point p = e.getPoint(); // 마우스 커서 위치 저장
+			for(int i =0; i<EnemyObj.enemys.size(); i++) { // 선택한 오브젝트 확인
+				Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
+				if (enemyBounds.contains(p)) {
+					obj = EnemyObj.enemys.get(i);
+					clickedObj = "enemy";
+					clickedExistedObj = true;
+				}
+				else continue;
+			}
+			for(int i =0; i<PlayerObj.player.size(); i++) {
+				Rectangle playerBounds = PlayerObj.player.get(i).getBounds();
+				if (playerBounds.contains(p)) {
+					obj = PlayerObj.player.get(i);
+					clickedObj = "player";
+					clickedExistedObj = true;
+				}
+				else continue;
 
-			                return; // 해당 객체와 일치하는 경우 커서를 설정하고 메서드를 종료
-			            }	
-			     }
+			}
+			System.out.println("clickedExistedObj: "+ clickedExistedObj);
+			// 패널에 이미 있던 오브젝트를 선택한 경우에만 해당 코드 실행
+			if(clickedExistedObj) {
+				switch(clickedObj) {
+				case "enemy":
+					ObjPanel.objCombo.setSelectedItem("Enemy");
+					selectedEnemy = (EnemyObj)obj; // 다운캐스팅
+	                x1 = selectedEnemy.getX();
+	                y1 = selectedEnemy.getY();
+	                x2 = x1 + selectedEnemy.getWidth();
+	                y2 = y1 + selectedEnemy.getHeight();
+	                // 선택한 것만 박스 그려지도록
+	                for (Component component : drawPanel.getComponents()) {
+	                    if (component instanceof PolygonObj) {
+	                        drawPanel.remove((PolygonObj) component);
+	                    }
+	                }
+	                rect = new PolygonObj(x1, y1, x2, y2);
+	                drawPanel.add(rect);
+	                drawPanel.repaint();
 
-				if(clickedEnemyObj) { // 이미 있는 오브젝트를 클릭했다면
-					
-
-				} else { // 새 오브젝트를 놓을 떄
-					int x = e.getX();
-					int y = e.getY();
-					int w = 50;
-					int h = 60;
-					String type = "LeftRight";
-					int speed = 2;
-					int life = 2;
-					ImageIcon icon = new ImageIcon(imagePath);
+					break;
+				case "player":
+					ObjPanel.objCombo.setSelectedItem("Player");
+					selectedPlayer = (PlayerObj)obj; // 다운캐스팅
+	                x1 = selectedPlayer.getX();
+	                y1 = selectedPlayer.getY();
+	                x2 = x1 + selectedPlayer.getWidth();
+	                y2 = y1 + selectedPlayer.getHeight();
+	                // 선택한 것만 박스 그려지도록
+	                for (Component component : drawPanel.getComponents()) {
+	                    if (component instanceof PolygonObj) {
+	                        drawPanel.remove((PolygonObj) component);
+	                    }
+	                }
+	                rect = new PolygonObj(x1, y1, x2, y2);
+	                drawPanel.add(rect);
+	                drawPanel.repaint();
+					break;
+				}
+			} 
+			else { // 오브젝트 생성
+				String selectedItem = ObjPanel.selectedItem;
+				int x,y,w,h,speed,life;
+				String type;
+				ImageIcon icon;
+				System.out.println(selectedItem);
+				switch(selectedItem) {
+				case "Enemy":
+					x = e.getX();
+					y = e.getY();
+					w = 50;
+					h = 60;
+					type = "LeftRight";
+					speed = 2;
+					life = 2;
+					icon = new ImageIcon(imagePath);
 					
 					System.out.println("panel clicked!");
 					enemyObj = new EnemyObj(x,y,w,h,type,speed,life,icon);
@@ -406,38 +439,152 @@ public class EnemyPanel extends JPanel{
 //					typeCombo.setSelectedItem(getSelectedItem);
 					typeCombo.setSelectedItem(type);
 					speedCombo.setSelectedItem(Integer.toString(speed));
+					
+					// 이미지목록패널의 테두리선 제거 및 선택초기화
+					clickedBtn.setBorder(null);
+					imagePath = null;
+					chooseImg = false;
+					break;
+				case "Player":
+					System.out.println("player아이템 선택");
+					if(PlayerObj.player.size() < 1) {
+						x = e.getX();
+						y = e.getY();
+						w = 40;
+						h = 60;
+						life = 5;
+						icon = new ImageIcon(imagePath);
+						System.out.println(imagePath);
+						
+						System.out.println("panel clicked!");
+						PlayerObj playerObj = new PlayerObj(x,y,w,h,life,icon);
+						PlayerObj.player.add(playerObj); // 벡터에 오브젝트 저장
+						drawPanel.add(playerObj);
+						drawPanel.repaint(); // drawPanel에 오브젝트 그린다
+						
+						xTextField.setText(Integer.toString(x));
+						yTextField.setText(Integer.toString(y));
+						wTextField.setText(Integer.toString(w));
+						hTextField.setText(Integer.toString(h));
+						lifeTextField.setText(Integer.toString(life));
+						
+						// 이미지목록패널의 테두리선 제거 및 선택초기화
+						clickedBtn.setBorder(null);
+						chooseImg = false;
+						imagePath = null;
+
+					}
+
+					break;
+				default:
+					hasBorder = !hasBorder;
+					if(hasBorder) {
+						drawPanel.setBorder(BorderFactory.createLineBorder(Color.blue,5));
+					} else {
+						drawPanel.setBorder(null);
+					}
+
+					break;
 				}
-
+				
+				
 			}
-			else { // 어떤 이미지도 선택하지 않을 경우, 패널의 위치와 크기를 이동한다.
-//				int x = e.getX();
-//				int y = e.getY();
-//				mainPanel.remove(drawPanel);
-//				drawPanel.setLocation(x,y);
-//				mainPanel.repaint();
+//				for(int i =0; i<EnemyObj.enemys.size(); i++) {
+//			           Point p = e.getPoint();
+//			           Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
+//			            if (enemyBounds.contains(p)) {
+//			                clickedEnemyObj = true;
+//			                System.out.println("find");
+//			                clickedEnemy = EnemyObj.enemys.get(i);
+//			                
+//			                int x1 = clickedEnemy.getX();
+//			                int y1 = clickedEnemy.getY();
+//			                int x2 = x1 + clickedEnemy.getWidth();
+//			                int y2 = y1 + clickedEnemy.getHeight();
+//			                // 선택한 것만 박스 그려지도록
+//			                for (Component component : drawPanel.getComponents()) {
+//			                    if (component instanceof PolygonObj) {
+//			                        drawPanel.remove((PolygonObj) component);
+//			                    }
+//			                }
+//			                rect = new PolygonObj(x1, y1, x2, y2);
+//			                drawPanel.add(rect);
+//			                drawPanel.repaint();
+//			                
+////			    			Cursor ne_cursor = new Cursor(Cursor.NE_RESIZE_CURSOR);
+////			    			drawPanel.setCursor(ne_cursor);
+//			                
+//							xTextField.setText(Integer.toString(clickedEnemy.getX()));
+//							yTextField.setText(Integer.toString(clickedEnemy.getY()));
+//							wTextField.setText(Integer.toString(clickedEnemy.getWidth()));
+//							hTextField.setText(Integer.toString(clickedEnemy.getHeight()));
+//							lifeTextField.setText(Integer.toString(clickedEnemy.getLife()));
+//							typeCombo.setSelectedItem(clickedEnemy.getType());
+//							speedCombo.setSelectedItem(clickedEnemy.getSpeed());
+//
+//			                return; // 해당 객체와 일치하는 경우 커서를 설정하고 메서드를 종료
+//			            }	
+//			     }
 
-			}
+//				if(clickedEnemyObj) { // 이미 있는 오브젝트를 클릭했다면
+//					
+//
+//				} else { // 새 오브젝트를 놓을 떄
+//					int x = e.getX();
+//					int y = e.getY();
+//					int w = 50;
+//					int h = 60;
+//					String type = "LeftRight";
+//					int speed = 2;
+//					int life = 2;
+//					ImageIcon icon = new ImageIcon(imagePath);
+//					
+//					System.out.println("panel clicked!");
+//					enemyObj = new EnemyObj(x,y,w,h,type,speed,life,icon);
+//					EnemyObj.enemys.add(enemyObj); // 벡터에 오브젝트 저장
+//					drawPanel.add(enemyObj);
+//					drawPanel.repaint(); // drawPanel에 오브젝트 그린다
+//					
+//					xTextField.setText(Integer.toString(x));
+//					yTextField.setText(Integer.toString(y));
+//					wTextField.setText(Integer.toString(w));
+//					hTextField.setText(Integer.toString(h));
+//					lifeTextField.setText(Integer.toString(life));
+////					String getSelectedItem = (String)typeCombo.getSelectedItem();
+////					getSelectedItem = type;
+////					typeCombo.setSelectedItem(getSelectedItem);
+//					typeCombo.setSelectedItem(type);
+//					speedCombo.setSelectedItem(Integer.toString(speed));
+//				}
+//
+//			}
+//			else { // 어떤 이미지도 선택하지 않을 경우, 패널의 위치와 크기를 이동한다.
+////				int x = e.getX();
+////				int y = e.getY();
+////				mainPanel.remove(drawPanel);
+////				drawPanel.setLocation(x,y);
+////				mainPanel.repaint();
+//
+//			}
 
 		}
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			if(chooseImg == true) {
-				Cursor hand_cursor = new Cursor(Cursor.HAND_CURSOR);
-				Cursor ne_cursor = new Cursor(Cursor.NE_RESIZE_CURSOR);
-				Cursor sw_cursor = new Cursor(Cursor.SW_RESIZE_CURSOR);
-				Cursor default_cursor = new Cursor(Cursor.DEFAULT_CURSOR);
+			Cursor hand_cursor = new Cursor(Cursor.HAND_CURSOR);
+			Cursor ne_cursor = new Cursor(Cursor.NE_RESIZE_CURSOR);
+			Cursor sw_cursor = new Cursor(Cursor.SW_RESIZE_CURSOR);
+			Cursor default_cursor = new Cursor(Cursor.DEFAULT_CURSOR);
 
-				for(int i =0; i<EnemyObj.enemys.size(); i++) {
-			           Point p = e.getPoint();
-			           Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
-			            if (enemyBounds.contains(p)) {
-			                drawPanel.setCursor(hand_cursor);
-			                return; // 해당 객체와 일치하는 경우 커서를 설정하고 메서드를 종료
-			            }	
-			     }
-				 drawPanel.setCursor(default_cursor);
+			for(int i =0; i<EnemyObj.enemys.size(); i++) {
+		           Point p = e.getPoint();
+		           Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
+		            if (enemyBounds.contains(p)) {
+		                drawPanel.setCursor(hand_cursor);
+		                return; // 해당 객체와 일치하는 경우 커서를 설정하고 메서드를 종료
+		            }	
+		     }
+			 drawPanel.setCursor(default_cursor);
 
-			}
 		}
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -461,20 +608,39 @@ public class EnemyPanel extends JPanel{
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(chooseImg==true) {
-				drawPanel.remove(rect);
-				int x = e.getX();
-				int y = e.getY();
-				clickedEnemy.setLocation(x,y);
-				clickedEnemy.setX(x);
-				clickedEnemy.setY(y);
-				drawPanel.repaint();
+				int x,y;
+				switch(clickedObj) {
+				case "enemy":
+					drawPanel.remove(rect);
+					x = e.getX();
+					y = e.getY();
+					selectedEnemy.setLocation(x,y);
+					selectedEnemy.setX(x);
+					selectedEnemy.setY(y);
+					drawPanel.repaint();
+					
+					// 속성필드 값변경
+					xTextField.setText(Integer.toString(x));
+					yTextField.setText(Integer.toString(y));
+					
+					break;
+				case "player":
+					drawPanel.remove(rect);
+					x = e.getX();
+					y = e.getY();
+					selectedPlayer.setLocation(x,y);
+					selectedPlayer.setX(x);
+					selectedPlayer.setY(y);
+					drawPanel.repaint();
+					
+					// 속성필드 값변경
+					xTextField.setText(Integer.toString(x));
+					yTextField.setText(Integer.toString(y));
+										
+					break;
+				}
 				
-				// 속성필드 값변경
-				xTextField.setText(Integer.toString(x));
-				yTextField.setText(Integer.toString(y));
-				
-			}
+			
 			
 		}
 	}

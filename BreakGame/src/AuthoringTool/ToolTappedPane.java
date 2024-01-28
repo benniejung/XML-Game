@@ -58,6 +58,7 @@ class BackgroundPanel extends JPanel {
 	DrawPanel drawPanel;
 	MainPanel mainPanel;
 	boolean hasBorder = false;
+	static boolean isBackgroundPanel = true;
 	
 	private JTextField xTextField, yTextField, wTextField, hTextField;
 	public BackgroundPanel(MainPanel mainPanel,DrawPanel drawPanel) {
