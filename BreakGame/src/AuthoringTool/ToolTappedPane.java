@@ -178,7 +178,7 @@ class BackgroundPanel extends JPanel {
 					JTextField textField = (JTextField)e.getSource();
 					int x = Integer.parseInt(textField.getText());
 					drawPanel.setSize(drawPanel.getWidth(), drawPanel.getHeight());
-					if(drawPanel.getWidth()!=800 || drawPanel.getHeight()!=800) { // 화면크기가 max가 아닐때만 움직이도록
+					if(drawPanel.getWidth()!=900 || drawPanel.getHeight()!=900) { // 화면크기가 max가 아닐때만 움직이도록
 						drawPanel.setLocation(x,drawPanel.getY());
 					}
 					
@@ -187,7 +187,7 @@ class BackgroundPanel extends JPanel {
 					JTextField textField = (JTextField)e.getSource();
 					int y = Integer.parseInt(textField.getText());
 					drawPanel.setSize(drawPanel.getWidth(), drawPanel.getHeight());
-					if(drawPanel.getWidth()!=800 || drawPanel.getHeight()!=800) {
+					if(drawPanel.getWidth()!=900 || drawPanel.getHeight()!=900) {
 						drawPanel.setLocation(drawPanel.getX(),y);
 					}
 				}

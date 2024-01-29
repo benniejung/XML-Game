@@ -45,7 +45,7 @@ public class PlayerPanel extends JPanel{
 	// 속성 레이블
 	private JLabel xLabel, yLabel, wLabel, hLabel, lifeLabel;
 	// 속성 텍스트필드
-	private JTextField xTextField, yTextField, wTextField,hTextField,lifeTextField;
+	static JTextField xTextField, yTextField, wTextField,hTextField,lifeTextField;
 	// 선택한 이미지 경로
 	String imagePath;
 	
@@ -174,17 +174,17 @@ public class PlayerPanel extends JPanel{
 	class actionEvent implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JButton clickedBtn = (JButton)e.getSource();
-			clickedBtn.setBorder(BorderFactory.createLineBorder(Color.red,5));
+			EnemyPanel.clickedBtn = (JButton)e.getSource();
+			EnemyPanel.clickedBtn.setBorder(BorderFactory.createLineBorder(Color.red,5));
 			// 기존에 선택한 버튼들의 Border를 제거
 	        for (Component component : imgsPanel.getComponents()) {
-	            if (component instanceof JButton && component != clickedBtn) {
+	            if (component instanceof JButton && component != EnemyPanel.clickedBtn) {
 	                ((JButton) component).setBorder(BorderFactory.createEmptyBorder());
 	            }
 	        }
 	        // 선택한 이미지 경로 가져오기
-	        if (clickedBtn.getIcon() instanceof ImageIcon) {
-	            ImageIcon icon = (ImageIcon) clickedBtn.getIcon();
+	        if (EnemyPanel.clickedBtn.getIcon() instanceof ImageIcon) {
+	            ImageIcon icon = (ImageIcon) EnemyPanel.clickedBtn.getIcon();
 	            imagePath = icon.getDescription();
 	            EnemyPanel.imagePath = imagePath;
 	            System.out.println("Selected Image Path: " + imagePath);
@@ -375,5 +375,10 @@ public class PlayerPanel extends JPanel{
 			
 		}
 	}
+	
+	public JTextField getXTextField() {return xTextField;}
+	public JTextField getYTextField() {return yTextField;}
+	public JTextField getWTextField() {return wTextField;}
+	public JTextField getHTextField() {return hTextField;}
 
 }

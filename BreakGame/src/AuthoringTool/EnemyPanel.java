@@ -52,14 +52,15 @@ public class EnemyPanel extends JPanel{
 	private JComboBox typeCombo, speedCombo;
 	
 	// 오브젝트 생성할 때 필요한 것들
-	JButton clickedBtn;
+	static JButton clickedBtn;
 	EnemyObj enemyObj, selectedEnemy;
 	PlayerObj playerObj, selectedPlayer;
+	static ShieldBlockObj shieldBlockObj, selectedShieldBlock;
 	
 	static String imagePath;
 	private boolean clickedDrawPanel = false;
 	static boolean chooseImg = false;
-	String clickedObj = null;
+	static String clickedObj = null;
 	boolean hasBorder = false;
 	// 생성된 오브젝트 저장하는 벡터
 //	Vector<EnemyObj> enemys = new Vector<EnemyObj>();
@@ -242,17 +243,20 @@ public class EnemyPanel extends JPanel{
 			int index;
 			switch(comboBox) {
 			case "typeCombo":
-				if(clickedEnemy !=null) {
-					index = source.getSelectedIndex();
-					String type = typeList[index];
-					clickedEnemy.setType(type);
+				if(clickedObj != null) {
+					if(clickedObj.equals("enemy")) {
+						index = source.getSelectedIndex();
+						String type = typeList[index];
+						selectedEnemy.setType(type);
+					} 
 				}
+
 				break;
 			case "speedCombo":
-				if(clickedEnemy !=null) {
+				if(selectedEnemy !=null) {
 					index = source.getSelectedIndex();
 					int speed = Integer.parseInt(speedList[index]);
-					clickedEnemy.setSpeed(speed);		
+					selectedEnemy.setSpeed(speed);		
 				}
 				break;
 			}
@@ -274,27 +278,69 @@ public class EnemyPanel extends JPanel{
 				if(changedSetting.equals("xTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int x = Integer.parseInt(textField.getText());
-					clickedEnemy.setLocation(x,clickedEnemy.getY());
-					clickedEnemy.setX(x);
+					if(clickedObj.equals("enemy")) {
+						selectedEnemy.setLocation(x,selectedEnemy.getY());
+						selectedEnemy.setX(x);
+					} else if(clickedObj.equals("player")) {
+						selectedPlayer.setLocation(x,selectedPlayer.getY());
+						selectedPlayer.setX(x);
+					
+					} else {
+						selectedShieldBlock.setLocation(x,selectedShieldBlock.getY());
+						selectedShieldBlock.setX(x);
+					}
 				} else if(changedSetting.equals("yTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int y = Integer.parseInt(textField.getText());
-					clickedEnemy.setLocation(clickedEnemy.getX(),y);
-					clickedEnemy.setY(y);
+					if(clickedObj.equals("enemy")) {
+						selectedEnemy.setLocation(selectedEnemy.getX(),y);
+						selectedEnemy.setY(y);
+					} else if(clickedObj.equals("player")) {
+						selectedPlayer.setLocation(selectedPlayer.getX(),y);
+						selectedPlayer.setY(y);
+					
+					} else {
+						selectedShieldBlock.setLocation(selectedShieldBlock.getX(),y);
+						selectedShieldBlock.setY(y);
+					}
+
 				} else if(changedSetting.equals("wTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int w = Integer.parseInt(textField.getText());
-					clickedEnemy.setSize(w,clickedEnemy.getH());
-					clickedEnemy.setW(w);
+					if(clickedObj.equals("enemy")) {
+						selectedEnemy.setSize(w,selectedEnemy.getH());
+						selectedEnemy.setW(w);
+					} else if(clickedObj.equals("player")) {
+						selectedPlayer.setSize(w,selectedPlayer.getH());
+						selectedPlayer.setW(w);
+					
+					} else {
+						selectedShieldBlock.setSize(w,selectedShieldBlock.getH());
+						selectedShieldBlock.setW(w);
+					}
 				} else if(changedSetting.equals("hTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int h = Integer.parseInt(textField.getText());
-					clickedEnemy.setSize(clickedEnemy.getW(),h);
-					clickedEnemy.setH(h);
+					if(clickedObj.equals("enemy")) {
+						selectedEnemy.setSize(selectedEnemy.getW(),h);
+						selectedEnemy.setH(h);
+					} else if(clickedObj.equals("player")) {
+						selectedPlayer.setSize(selectedPlayer.getW(),h);
+						selectedPlayer.setH(h);
+					
+					} else {
+						selectedShieldBlock.setSize(selectedShieldBlock.getW(),h);
+						selectedShieldBlock.setH(h);
+					}
+	
 				} else if(changedSetting.equals("lifeTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int life = Integer.parseInt(textField.getText());
-					clickedEnemy.setLife(life);
+					if(clickedObj.equals("enemy")) {
+						selectedEnemy.setLife(life);
+					} else if(clickedObj.equals("player")) {
+						selectedPlayer.setLife(life);				
+					}
 				}
 				drawPanel.remove(rect);
 				drawPanel.repaint();
@@ -345,6 +391,8 @@ public class EnemyPanel extends JPanel{
 			boolean clickedExistedObj = false; // 새로 생성 여부를 정하기 위한 변수
 			Object obj = null;
 			int x1,y1,x2,y2;
+			int w,h,life,speed;
+			String type;
 			Point p = e.getPoint(); // 마우스 커서 위치 저장
 			for(int i =0; i<EnemyObj.enemys.size(); i++) { // 선택한 오브젝트 확인
 				Rectangle enemyBounds = EnemyObj.enemys.get(i).getBounds();
@@ -365,6 +413,17 @@ public class EnemyPanel extends JPanel{
 				else continue;
 
 			}
+			for(int i =0; i<ShieldBlockObj.shieldBlocks.size(); i++) {
+				Rectangle shieldBlockBounds = ShieldBlockObj.shieldBlocks.get(i).getBounds();
+				if (shieldBlockBounds.contains(p)) {
+					obj = ShieldBlockObj.shieldBlocks.get(i);
+					clickedObj = "shieldBlock";
+					clickedExistedObj = true;
+				}
+				else continue;
+
+			}
+			
 			System.out.println("clickedExistedObj: "+ clickedExistedObj);
 			// 패널에 이미 있던 오브젝트를 선택한 경우에만 해당 코드 실행
 			if(clickedExistedObj) {
@@ -385,6 +444,24 @@ public class EnemyPanel extends JPanel{
 	                rect = new PolygonObj(x1, y1, x2, y2);
 	                drawPanel.add(rect);
 	                drawPanel.repaint();
+	                
+	                w = selectedEnemy.getW();
+	                h = selectedEnemy.getH();
+	                life = selectedEnemy.getLife();
+	                speed = selectedEnemy.getSpeed();
+	                type = selectedEnemy.getType();
+	                
+	                // 해당 오브젝트의 설정값 나타나도록
+					xTextField.setText(Integer.toString(x1));
+					yTextField.setText(Integer.toString(y1));
+					wTextField.setText(Integer.toString(w));
+					hTextField.setText(Integer.toString(h));
+					lifeTextField.setText(Integer.toString(life));
+//					String getSelectedItem = (String)typeCombo.getSelectedItem();
+//					getSelectedItem = type;
+//					typeCombo.setSelectedItem(getSelectedItem);
+					typeCombo.setSelectedItem(type);
+					speedCombo.setSelectedItem(Integer.toString(speed));
 
 					break;
 				case "player":
@@ -403,41 +480,81 @@ public class EnemyPanel extends JPanel{
 	                rect = new PolygonObj(x1, y1, x2, y2);
 	                drawPanel.add(rect);
 	                drawPanel.repaint();
+	                
+	                w = selectedPlayer.getW();
+	                h = selectedPlayer.getH();
+	                life = selectedPlayer.getLife();
+
+	                // 해당 오브젝트의 설정값 나타나도록
+					PlayerPanel.xTextField.setText(Integer.toString(x1));
+					PlayerPanel.yTextField.setText(Integer.toString(y1));
+					PlayerPanel.wTextField.setText(Integer.toString(w));
+					PlayerPanel.hTextField.setText(Integer.toString(h));
+					PlayerPanel.lifeTextField.setText(Integer.toString(life));
+
+					break;
+				case "shieldBlock":
+					ObjPanel.objCombo.setSelectedItem("ShieldBlock");
+					selectedShieldBlock = (ShieldBlockObj)obj; // 다운캐스팅
+	                x1 = selectedShieldBlock.getX();
+	                y1 = selectedShieldBlock.getY();
+	                x2 = x1 + selectedShieldBlock.getWidth();
+	                y2 = y1 + selectedShieldBlock.getHeight();
+	                // 선택한 것만 박스 그려지도록
+	                for (Component component : drawPanel.getComponents()) {
+	                    if (component instanceof PolygonObj) {
+	                        drawPanel.remove((PolygonObj) component);
+	                    }
+	                }
+	                rect = new PolygonObj(x1, y1, x2, y2);
+	                drawPanel.add(rect);
+	                drawPanel.repaint();
+	                
+	                w = selectedShieldBlock.getW();
+	                h = selectedShieldBlock.getH();
+	                type = selectedShieldBlock.getType();
+	                
+	                // 해당 오브젝트의 설정값 나타나도록
+					ShieldBlockPanel.xTextField.setText(Integer.toString(x1));
+					ShieldBlockPanel.yTextField.setText(Integer.toString(y1));
+					ShieldBlockPanel.wTextField.setText(Integer.toString(w));
+					ShieldBlockPanel.hTextField.setText(Integer.toString(h));
+					ShieldBlockPanel.typeCombo.setSelectedItem(type);
+
 					break;
 				}
 			} 
 			else { // 오브젝트 생성
 				String selectedItem = ObjPanel.selectedItem;
-				int x,y,w,h,speed,life;
-				String type;
+
 				ImageIcon icon;
 				System.out.println(selectedItem);
 				switch(selectedItem) {
 				case "Enemy":
-					x = e.getX();
-					y = e.getY();
-					w = 50;
-					h = 60;
-					type = "LeftRight";
+					int x = e.getX();
+					int y = e.getY();
+					int w1 = 50;
+					int h1 = 60;
+					String type1 = "LeftRight";
 					speed = 2;
 					life = 2;
 					icon = new ImageIcon(imagePath);
 					
 					System.out.println("panel clicked!");
-					enemyObj = new EnemyObj(x,y,w,h,type,speed,life,icon);
+					enemyObj = new EnemyObj(x,y,w1,h1,type1,speed,life,icon);
 					EnemyObj.enemys.add(enemyObj); // 벡터에 오브젝트 저장
 					drawPanel.add(enemyObj);
 					drawPanel.repaint(); // drawPanel에 오브젝트 그린다
 					
 					xTextField.setText(Integer.toString(x));
 					yTextField.setText(Integer.toString(y));
-					wTextField.setText(Integer.toString(w));
-					hTextField.setText(Integer.toString(h));
+					wTextField.setText(Integer.toString(w1));
+					hTextField.setText(Integer.toString(h1));
 					lifeTextField.setText(Integer.toString(life));
 //					String getSelectedItem = (String)typeCombo.getSelectedItem();
 //					getSelectedItem = type;
 //					typeCombo.setSelectedItem(getSelectedItem);
-					typeCombo.setSelectedItem(type);
+					typeCombo.setSelectedItem(type1);
 					speedCombo.setSelectedItem(Integer.toString(speed));
 					
 					// 이미지목록패널의 테두리선 제거 및 선택초기화
@@ -450,23 +567,23 @@ public class EnemyPanel extends JPanel{
 					if(PlayerObj.player.size() < 1) {
 						x = e.getX();
 						y = e.getY();
-						w = 40;
-						h = 60;
+						w1 = 40;
+						h1 = 60;
 						life = 5;
 						icon = new ImageIcon(imagePath);
 						System.out.println(imagePath);
 						
 						System.out.println("panel clicked!");
-						PlayerObj playerObj = new PlayerObj(x,y,w,h,life,icon);
+						PlayerObj playerObj = new PlayerObj(x,y,w1,h1,life,icon);
 						PlayerObj.player.add(playerObj); // 벡터에 오브젝트 저장
 						drawPanel.add(playerObj);
 						drawPanel.repaint(); // drawPanel에 오브젝트 그린다
 						
-						xTextField.setText(Integer.toString(x));
-						yTextField.setText(Integer.toString(y));
-						wTextField.setText(Integer.toString(w));
-						hTextField.setText(Integer.toString(h));
-						lifeTextField.setText(Integer.toString(life));
+						PlayerPanel.xTextField.setText(Integer.toString(x));
+						PlayerPanel.yTextField.setText(Integer.toString(y));
+						PlayerPanel.wTextField.setText(Integer.toString(w1));
+						PlayerPanel.hTextField.setText(Integer.toString(h1));
+						PlayerPanel.lifeTextField.setText(Integer.toString(life));
 						
 						// 이미지목록패널의 테두리선 제거 및 선택초기화
 						clickedBtn.setBorder(null);
@@ -474,6 +591,32 @@ public class EnemyPanel extends JPanel{
 						imagePath = null;
 
 					}
+
+					break;
+				case "ShieldBlock":
+					x = e.getX();
+					y = e.getY();
+					w1 = 50;
+					h1 = 60;
+					type1 = "breakable";
+					icon = new ImageIcon(imagePath);
+					
+					System.out.println("panel clicked!");
+					shieldBlockObj = new ShieldBlockObj(x,y,w1,h1,type1, icon);
+					ShieldBlockObj.shieldBlocks.add(shieldBlockObj); // 벡터에 오브젝트 저장
+					drawPanel.add(shieldBlockObj);
+					drawPanel.repaint(); // drawPanel에 오브젝트 그린다
+					
+					ShieldBlockPanel.xTextField.setText(Integer.toString(x));
+					ShieldBlockPanel.yTextField.setText(Integer.toString(y));
+					ShieldBlockPanel.wTextField.setText(Integer.toString(w1));
+					ShieldBlockPanel.hTextField.setText(Integer.toString(h1));
+					ShieldBlockPanel.typeCombo.setSelectedItem(type1);
+					
+					// 이미지목록패널의 테두리선 제거 및 선택초기화
+					clickedBtn.setBorder(null);
+					chooseImg = false;
+					imagePath = null;
 
 					break;
 				default:
@@ -634,9 +777,23 @@ public class EnemyPanel extends JPanel{
 					drawPanel.repaint();
 					
 					// 속성필드 값변경
-					xTextField.setText(Integer.toString(x));
-					yTextField.setText(Integer.toString(y));
+					PlayerPanel.xTextField.setText(Integer.toString(x));
+					PlayerPanel.yTextField.setText(Integer.toString(y));
 										
+					break;
+				case "shieldBlock":
+					drawPanel.remove(rect);
+					x = e.getX();
+					y = e.getY();
+					selectedShieldBlock.setLocation(x,y);
+					selectedShieldBlock.setX(x);
+					selectedShieldBlock.setY(y);
+					drawPanel.repaint();
+					
+					// 속성필드 값변경
+					ShieldBlockPanel.xTextField.setText(Integer.toString(x));
+					ShieldBlockPanel.yTextField.setText(Integer.toString(y));
+
 					break;
 				}
 				
