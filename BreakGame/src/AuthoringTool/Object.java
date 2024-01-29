@@ -171,3 +171,35 @@ class ShieldBlockObj extends Object {
 	public void setType(String newType) {type = newType;}
 
 }
+class ItemObj extends Object {
+	private String type;
+	static Vector<ItemObj> heartItemObjArr = new Vector<ItemObj>(1);
+	static Vector<ItemObj> shieldItemObjArr = new Vector<ItemObj>(1);
+	public ItemObj() {};
+	public ItemObj(int x, int y, int w, int h, ImageIcon icon) {
+		super(x,y,w,h,icon);
+	}
+	@Override
+	public String toString() {
+		String text = "<Items>\n";
+		for(int i =0; i<heartItemObjArr.size(); i++) {
+			ItemObj item = heartItemObjArr.get(i);
+			String iconDescription = item.icon.getDescription();
+			text+= "<Item x=\""+item.getX()+"\" y=\""+item.getY()+"\" w=\""+item.getW()+"\" h=\""+item.getH()+"\"";
+			text+= " icon=\""+iconDescription+"\"></Item>\n";
+		}
+		for(int i =0; i<shieldItemObjArr.size(); i++) {
+			ItemObj item = shieldItemObjArr.get(i);
+			String iconDescription = item.icon.getDescription();
+			text+= "<Item x=\""+item.getX()+"\" y=\""+item.getY()+"\" w=\""+item.getW()+"\" h=\""+item.getH()+"\"";
+			text+= " icon=\""+iconDescription+"\"></Item>\n";
+		}
+		text+="</Items>\n";
+		return text;
+	}
+	public String getType() {return type;}
+	
+	public void setType(String newType) {type = newType;}
+
+}
+

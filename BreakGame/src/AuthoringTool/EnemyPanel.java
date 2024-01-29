@@ -53,9 +53,10 @@ public class EnemyPanel extends JPanel{
 	
 	// 오브젝트 생성할 때 필요한 것들
 	static JButton clickedBtn;
-	EnemyObj enemyObj, selectedEnemy;
-	PlayerObj playerObj, selectedPlayer;
+	static EnemyObj enemyObj, selectedEnemy;
+	static PlayerObj playerObj, selectedPlayer;
 	static ShieldBlockObj shieldBlockObj, selectedShieldBlock;
+	static ItemObj itemObj,selectedItem;
 	
 	static String imagePath;
 	private boolean clickedDrawPanel = false;
@@ -67,7 +68,7 @@ public class EnemyPanel extends JPanel{
 	
 	// 패널에서 클릭한 오브젝트
 	EnemyObj clickedEnemy;
-	PolygonObj rect;
+	static PolygonObj rect;
 	
 	
 	public EnemyPanel(DrawPanel drawPanel) {
@@ -281,28 +282,14 @@ public class EnemyPanel extends JPanel{
 					if(clickedObj.equals("enemy")) {
 						selectedEnemy.setLocation(x,selectedEnemy.getY());
 						selectedEnemy.setX(x);
-					} else if(clickedObj.equals("player")) {
-						selectedPlayer.setLocation(x,selectedPlayer.getY());
-						selectedPlayer.setX(x);
-					
-					} else {
-						selectedShieldBlock.setLocation(x,selectedShieldBlock.getY());
-						selectedShieldBlock.setX(x);
-					}
+					} 
 				} else if(changedSetting.equals("yTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int y = Integer.parseInt(textField.getText());
 					if(clickedObj.equals("enemy")) {
 						selectedEnemy.setLocation(selectedEnemy.getX(),y);
 						selectedEnemy.setY(y);
-					} else if(clickedObj.equals("player")) {
-						selectedPlayer.setLocation(selectedPlayer.getX(),y);
-						selectedPlayer.setY(y);
-					
-					} else {
-						selectedShieldBlock.setLocation(selectedShieldBlock.getX(),y);
-						selectedShieldBlock.setY(y);
-					}
+					}  
 
 				} else if(changedSetting.equals("wTextField")) {
 					JTextField textField = (JTextField)e.getSource();
@@ -310,37 +297,21 @@ public class EnemyPanel extends JPanel{
 					if(clickedObj.equals("enemy")) {
 						selectedEnemy.setSize(w,selectedEnemy.getH());
 						selectedEnemy.setW(w);
-					} else if(clickedObj.equals("player")) {
-						selectedPlayer.setSize(w,selectedPlayer.getH());
-						selectedPlayer.setW(w);
-					
-					} else {
-						selectedShieldBlock.setSize(w,selectedShieldBlock.getH());
-						selectedShieldBlock.setW(w);
-					}
+					} 
 				} else if(changedSetting.equals("hTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int h = Integer.parseInt(textField.getText());
 					if(clickedObj.equals("enemy")) {
 						selectedEnemy.setSize(selectedEnemy.getW(),h);
 						selectedEnemy.setH(h);
-					} else if(clickedObj.equals("player")) {
-						selectedPlayer.setSize(selectedPlayer.getW(),h);
-						selectedPlayer.setH(h);
-					
-					} else {
-						selectedShieldBlock.setSize(selectedShieldBlock.getW(),h);
-						selectedShieldBlock.setH(h);
-					}
+					} 
 	
 				} else if(changedSetting.equals("lifeTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int life = Integer.parseInt(textField.getText());
 					if(clickedObj.equals("enemy")) {
 						selectedEnemy.setLife(life);
-					} else if(clickedObj.equals("player")) {
-						selectedPlayer.setLife(life);				
-					}
+					} 
 				}
 				drawPanel.remove(rect);
 				drawPanel.repaint();
@@ -423,6 +394,27 @@ public class EnemyPanel extends JPanel{
 				else continue;
 
 			}
+			for(int i =0; i<ItemObj.heartItemObjArr.size(); i++) {
+				Rectangle heartItemBounds = ItemObj.heartItemObjArr.get(i).getBounds();
+				if (heartItemBounds.contains(p)) {
+					obj = ItemObj.heartItemObjArr.get(i);
+					clickedObj = "item";
+					clickedExistedObj = true;
+				}
+				else continue;
+
+			}
+			for(int i =0; i<ItemObj.shieldItemObjArr.size(); i++) {
+				Rectangle shieldItemBounds = ItemObj.shieldItemObjArr.get(i).getBounds();
+				if (shieldItemBounds.contains(p)) {
+					obj = ItemObj.shieldItemObjArr.get(i);
+					clickedObj = "item";
+					clickedExistedObj = true;
+				}
+				else continue;
+
+			}
+
 			
 			System.out.println("clickedExistedObj: "+ clickedExistedObj);
 			// 패널에 이미 있던 오브젝트를 선택한 경우에만 해당 코드 실행
@@ -522,6 +514,32 @@ public class EnemyPanel extends JPanel{
 					ShieldBlockPanel.typeCombo.setSelectedItem(type);
 
 					break;
+				case "item":
+					ObjPanel.objCombo.setSelectedItem("Item");
+					selectedItem = (ItemObj)obj; // 다운캐스팅
+	                x1 = selectedItem.getX();
+	                y1 = selectedItem.getY();
+	                x2 = x1 + selectedItem.getWidth();
+	                y2 = y1 + selectedItem.getHeight();
+	                // 선택한 것만 박스 그려지도록
+	                for (Component component : drawPanel.getComponents()) {
+	                    if (component instanceof PolygonObj) {
+	                        drawPanel.remove((PolygonObj) component);
+	                    }
+	                }
+	                rect = new PolygonObj(x1, y1, x2, y2);
+	                drawPanel.add(rect);
+	                drawPanel.repaint();
+	                
+	                w = selectedItem.getW();
+	                h = selectedItem.getH();
+	                
+	                // 해당 오브젝트의 설정값 나타나도록
+					ItemPanel.xTextField.setText(Integer.toString(x1));
+					ItemPanel.yTextField.setText(Integer.toString(y1));
+					ItemPanel.wTextField.setText(Integer.toString(w));
+					ItemPanel.hTextField.setText(Integer.toString(h));
+					break;
 				}
 			} 
 			else { // 오브젝트 생성
@@ -612,6 +630,49 @@ public class EnemyPanel extends JPanel{
 					ShieldBlockPanel.wTextField.setText(Integer.toString(w1));
 					ShieldBlockPanel.hTextField.setText(Integer.toString(h1));
 					ShieldBlockPanel.typeCombo.setSelectedItem(type1);
+					
+					// 이미지목록패널의 테두리선 제거 및 선택초기화
+					clickedBtn.setBorder(null);
+					chooseImg = false;
+					imagePath = null;
+
+					break;
+				case "Item":
+					x = e.getX();
+					y = e.getY();
+					w1 = 50;
+					h1 = 60;
+					icon = new ImageIcon(imagePath);
+					
+					System.out.println("panel clicked!");
+					itemObj = new ItemObj(x,y,w1,h1,icon);
+					if(ItemPanel.imgPanelName.equals("lifeImgsPanel")) {
+						if(ItemObj.heartItemObjArr.size()!=1) { // 벡터에 하나만 저장하고 그릴 수 있도록
+							ItemObj.heartItemObjArr.add(itemObj); // 벡터에 오브젝트 저장
+							drawPanel.add(itemObj);
+							drawPanel.repaint(); // drawPanel에 오브젝트 그린다
+
+						}
+						else {
+							// 벡터가 꽉차면 tooltip 달기?
+						}
+					}
+					if(ItemPanel.imgPanelName.equals("shieldImgsPanel")) {
+						if(ItemObj.shieldItemObjArr.size()!=1) { // 벡터에 하나만 저장하고 그릴 수 있도록
+							ItemObj.shieldItemObjArr.add(itemObj); // 벡터에 오브젝트 저장
+							drawPanel.add(itemObj);
+							drawPanel.repaint(); // drawPanel에 오브젝트 그린다
+						}
+						else {
+							// 벡터가 꽉차면 tooltip 달기?
+						}
+					}
+					
+					ItemPanel.xTextField.setText(Integer.toString(x));
+					ItemPanel.yTextField.setText(Integer.toString(y));
+					ItemPanel.wTextField.setText(Integer.toString(w1));
+					ItemPanel.hTextField.setText(Integer.toString(h1));
+					
 					
 					// 이미지목록패널의 테두리선 제거 및 선택초기화
 					clickedBtn.setBorder(null);
@@ -795,7 +856,22 @@ public class EnemyPanel extends JPanel{
 					ShieldBlockPanel.yTextField.setText(Integer.toString(y));
 
 					break;
+				case "item":
+					drawPanel.remove(rect);
+					x = e.getX();
+					y = e.getY();
+					selectedItem.setLocation(x,y);
+					selectedItem.setX(x);
+					selectedItem.setY(y);
+					drawPanel.repaint();
+					
+					// 속성필드 값변경
+					ItemPanel.xTextField.setText(Integer.toString(x));
+					ItemPanel.yTextField.setText(Integer.toString(y));
+
+					break;
 				}
+				
 				
 			
 			

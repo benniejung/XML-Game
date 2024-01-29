@@ -229,44 +229,55 @@ public class ShieldBlockPanel extends JPanel{
 		public void keyPressed(KeyEvent e) {
 			int keyCode = e.getKeyCode();
 			switch(keyCode) {
-//			case KeyEvent.VK_ENTER:
-				//enemys.remove(clickedEnemy);
-//				if(changedSetting.equals("xTextField")) {
-//					JTextField textField = (JTextField)e.getSource();
-//					int x = Integer.parseInt(textField.getText());
-//					clickedShieldBlock.setLocation(x,clickedShieldBlock.getY());
-//					clickedShieldBlock.setX(x);
-//				} else if(changedSetting.equals("yTextField")) {
-//					JTextField textField = (JTextField)e.getSource();
-//					int y = Integer.parseInt(textField.getText());
-//					clickedShieldBlock.setLocation(clickedShieldBlock.getX(),y);
-//					clickedShieldBlock.setY(y);
-//				} else if(changedSetting.equals("wTextField")) {
-//					JTextField textField = (JTextField)e.getSource();
-//					int w = Integer.parseInt(textField.getText());
-//					clickedShieldBlock.setSize(w,clickedShieldBlock.getH());
-//					clickedShieldBlock.setW(w);
-//				} else if(changedSetting.equals("hTextField")) {
-//					JTextField textField = (JTextField)e.getSource();
-//					int h = Integer.parseInt(textField.getText());
-//					clickedShieldBlock.setSize(clickedShieldBlock.getW(),h);
-//					clickedShieldBlock.setH(h);
-//				}
-//				drawPanel.remove(rect);
-//				drawPanel.repaint();
-//
-//                break;
-//			case KeyEvent.VK_BACK_SPACE:
-//				System.out.println("remove");
-//				drawPanel.remove(rect);
-//				drawPanel.remove(clickedShieldBlock);
-//				ShieldBlockObj.shieldBlocks.remove(clickedShieldBlock);
-//				drawPanel.repaint();
-//				
-//				break;
-//			}
-//			
-//		}
+			case KeyEvent.VK_ENTER:
+				if(changedSetting.equals("xTextField")) {
+					JTextField textField = (JTextField)e.getSource();
+					int x = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("shieldBlock")) {
+						EnemyPanel.selectedShieldBlock.setLocation(x,EnemyPanel.selectedShieldBlock.getY());
+						EnemyPanel.selectedShieldBlock.setX(x);
+					
+					}
+				} else if(changedSetting.equals("yTextField")) {
+					JTextField textField = (JTextField)e.getSource();
+					int y = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("shieldBlock")) {
+						EnemyPanel.selectedShieldBlock.setLocation(EnemyPanel.selectedShieldBlock.getX(),y);
+						EnemyPanel.selectedShieldBlock.setY(y);
+					
+					}
+				} else if(changedSetting.equals("wTextField")) {
+					JTextField textField = (JTextField)e.getSource();
+					int w = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("shieldBlock")) {
+						EnemyPanel.selectedShieldBlock.setSize(w,EnemyPanel.selectedShieldBlock.getH());
+						EnemyPanel.selectedShieldBlock.setW(w);
+					
+					}
+				} else if(changedSetting.equals("hTextField")) {
+					JTextField textField = (JTextField)e.getSource();
+					int h = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("shieldBlock")) {
+						EnemyPanel.selectedShieldBlock.setSize(EnemyPanel.selectedShieldBlock.getW(),h);
+						EnemyPanel.selectedShieldBlock.setH(h);
+					
+					}
+				} 
+				drawPanel.remove(EnemyPanel.rect);
+				drawPanel.repaint();
+
+                break;
+			case KeyEvent.VK_BACK_SPACE:
+				System.out.println("remove");
+				drawPanel.remove(rect);
+				drawPanel.remove(clickedShieldBlock);
+				ShieldBlockObj.shieldBlocks.remove(clickedShieldBlock);
+				drawPanel.repaint();
+				
+				break;
+			}
+			
+		}
 	}
 	class DrawMouseListener implements MouseMotionListener,MouseListener {
 		@Override
@@ -406,6 +417,5 @@ public class ShieldBlockPanel extends JPanel{
 			
 		}
 	}
-		}
+		
 	}
-}

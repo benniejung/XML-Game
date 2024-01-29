@@ -210,21 +210,43 @@ public class PlayerPanel extends JPanel{
 				if(changedSetting.equals("xTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int x = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("player")) {
+						EnemyPanel.selectedPlayer.setLocation(x,EnemyPanel.selectedPlayer.getY());
+						EnemyPanel.selectedPlayer.setX(x);
 					
+					}
 				} else if(changedSetting.equals("yTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int y = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("player")) {
+						EnemyPanel.selectedPlayer.setLocation(EnemyPanel.selectedPlayer.getX(),y);
+						EnemyPanel.selectedPlayer.setY(y);
+					
+					}
 				} else if(changedSetting.equals("wTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int w = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("player")) {
+						EnemyPanel.selectedPlayer.setSize(w,EnemyPanel.selectedPlayer.getH());
+						EnemyPanel.selectedPlayer.setW(w);
+					
+					}
 				} else if(changedSetting.equals("hTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int h = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("player")) {
+						EnemyPanel.selectedPlayer.setSize(EnemyPanel.selectedPlayer.getW(),h);
+						EnemyPanel.selectedPlayer.setH(h);
+					
+					}
 				} else if(changedSetting.equals("lifeTextField")) {
 					JTextField textField = (JTextField)e.getSource();
 					int life = Integer.parseInt(textField.getText());
+					if(EnemyPanel.clickedObj.equals("player")) {
+						EnemyPanel.selectedPlayer.setLife(life);				
+					}
 				}
-				drawPanel.remove(rect);
+				drawPanel.remove(EnemyPanel.rect);
 				drawPanel.repaint();
 
                 break;

@@ -15,6 +15,8 @@ public class ObjPanel extends JPanel {
 	private EnemyPanel enemyPanel;
 	private PlayerPanel playerPanel;
 	private ShieldBlockPanel shieldBlockPanel;
+	private ItemPanel itemPanel;
+	
 	private JPanel selectedObjPanel;
 	static String selectedItem = "Enemy";
 	static JComboBox<String> objCombo;
@@ -38,9 +40,13 @@ public class ObjPanel extends JPanel {
         enemyPanel = new EnemyPanel(drawPanel);
         playerPanel = new PlayerPanel(drawPanel);
         shieldBlockPanel = new ShieldBlockPanel(drawPanel);
+        itemPanel = new ItemPanel(drawPanel);
+        
         enemyPanel.setVisible(true);
         playerPanel.setVisible(true);
         shieldBlockPanel.setVisible(true);
+        itemPanel.setVisible(true);
+        
         selectedObjPanel.add(enemyPanel);
     }
 	
@@ -67,6 +73,10 @@ public class ObjPanel extends JPanel {
                 selectedObjPanel.add("ShieldBlockPanel", shieldBlockPanel);
                 cardLayout.show(selectedObjPanel, "ShieldBlockPanel");
                 break;
+            case "Item":
+            	selectedObjPanel.add("ItemPanel", itemPanel);
+            	cardLayout.show(selectedObjPanel, "ItemPanel");
+            	break;
             }        
         }
 	}
