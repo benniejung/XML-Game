@@ -14,19 +14,23 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.Timer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,20 +40,21 @@ public class MainGame extends JFrame {
 	GamePanel gamePanel;
 	GameInfoPanel gameInfoPanel = new GameInfoPanel();
 	Container c;
+	Music music = new Music();
 	MainGame() {
 		setTitle("Break Game");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		XMLReader xml = new XMLReader(GameManagement.xmlFile + ".xml");
+		XMLReader xml = new XMLReader(GameManagement.xmlFile);
 		
 		Node mainGameNode = xml.getMainGameElement();
 		Node sizeNode = XMLReader.getNode(mainGameNode,XMLReader.E_SIZE);
 		
 		String w = XMLReader.getAttr(sizeNode, "w");
 		String h = XMLReader.getAttr(sizeNode, "h");
-		setSize(Integer.parseInt(w), Integer.parseInt(h));
+		setSize(Integer.parseInt(w), Integer.parseInt(h)+100);
 		 
 		c = getContentPane();
-		gamePanel = new GamePanel(xml.getGamePanelElement(), gameInfoPanel);
+		gamePanel = new GamePanel(xml.getGamePanelElement(), gameInfoPanel, music);
 	    c.add(gamePanel);
 	    makeSplitPane();
 	    gamePanel.requestFocus();
@@ -57,8 +62,6 @@ public class MainGame extends JFrame {
 		createGameMenu();
 		setResizable(false);  // 크기 고정
 		setVisible(true);
-		
-  
 		
 	}	// 스플릿팬 만들기 (영역 만들고 패널 부착)
 	private void makeSplitPane() {
@@ -74,7 +77,7 @@ public class MainGame extends JFrame {
 
 	private void createGameMenu() {
 		JMenuBar gameMenuBar = new JMenuBar();
-		String[] fileItemTitle = {"game1", "game2", "game3" };
+		//String[] fileItemTitle = {"game1", "game2", "game3" };
 		String[] audioItemTitle = {"on", "off"};
 		
 		JMenu audioMenu = new JMenu("Audio");
@@ -84,20 +87,26 @@ public class MainGame extends JFrame {
 		
 		
 		JMenuItem [] audioItem = new JMenuItem[2];
-		JMenuItem [] fileItem = new JMenuItem[3];
+		//JMenuItem [] fileItem = new JMenuItem[3];
 		
 		FileMenuActionListener fileMenuActionListener = new FileMenuActionListener();
 		AudioMenuActionListener audioMenuActionListener = new AudioMenuActionListener();
 		StopMenuActionListener stopMenuActionListener = new StopMenuActionListener();
 		StartMenuActionListener startMenuActionListener = new StartMenuActionListener();
+		
+		
+		JMenuItem fileItem = new JMenuItem("파일 선택");
+		fileItem.addActionListener(fileMenuActionListener);
+		fileMenu.add(fileItem);
 
 		// 파일 메뉴아이템
-		for(int i =0; i<fileItemTitle.length; i++) {
-			fileItem[i] = new JMenuItem(fileItemTitle[i]);
-			fileItem[i].addActionListener(fileMenuActionListener);
-			fileMenu.add(fileItem[i]);
-
-		}
+		
+//		for(int i =0; i<fileItemTitle.length; i++) {
+//			fileItem[i] = new JMenuItem(fileItemTitle[i]);
+//			fileItem[i].addActionListener(fileMenuActionListener);
+//			fileMenu.add(fileItem[i]);
+//
+//		}
 		gameMenuBar.add(fileMenu);
 		// 오디오 메뉴아이템
 		for(int i =0; i<audioItemTitle.length; i++) {
@@ -125,16 +134,32 @@ public class MainGame extends JFrame {
 		setJMenuBar(gameMenuBar);
 	}
 	class FileMenuActionListener implements ActionListener {
+		private JFileChooser chooser;
+		public FileMenuActionListener() {
+			chooser = new JFileChooser("C:\\Users\\User\\git\\XML-Game\\BreakGame"); // 해당 경로에서 파일 찾기
+
+		}
 		public void actionPerformed(ActionEvent e) {
-			String cmd = e.getActionCommand(); // 선택한 메뉴아이템
-			GameManagement.xmlFile = cmd;
-			dispose();
-			new MainGame();
+//			String cmd = e.getActionCommand(); // 선택한 메뉴아이템
+//			GameManagement.xmlFile = cmd;
+//			dispose();
+//			new MainGame();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("XML", "xml");
+			chooser.setFileFilter(filter); // xml파일만 선택할 수 있음
+			int ret = chooser.showSaveDialog(gamePanel);
+			if (ret != JFileChooser.APPROVE_OPTION) {
+				JOptionPane.showMessageDialog(null, "파일을 저장해주세요", "파일 저장", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+	
 		}
 	}
 	class AudioMenuActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String cmd = e.getActionCommand(); // 선택한 메뉴아이템
+			if(cmd.equals("off")) {
+				music.stopAudio("all");
+			}
 
 		}
 	}
@@ -160,7 +185,7 @@ public class MainGame extends JFrame {
 	}
 }
 
-class GamePanel extends JPanel implements Runnable{
+class GamePanel extends JPanel {
 //	 노드 변수들
 	private Player player;
 	private Meteor meteor;
@@ -170,7 +195,7 @@ class GamePanel extends JPanel implements Runnable{
 	private JLabel lifeTextLabel = new JLabel(new ImageIcon("image/life.png"));
 	JLabel lifeLabel;
 	JLabel scoreLabel;
-	ImageIcon playerBulletIcon;
+	ImageIcon playerBulletIcon = new ImageIcon("image/bullet.png");
 
 	// 음악
 	private Music music = null;
@@ -181,9 +206,9 @@ class GamePanel extends JPanel implements Runnable{
 	private GameInfoPanel gameInfoPanel;
 	
 	
-	ArrayList<Label> itemArr = new ArrayList<Label>();
-	ArrayList<Enemy> enemyArr = new ArrayList<Enemy>();
-	ArrayList<ShieldBlock> shieldBlockArr = new ArrayList<ShieldBlock>();
+	Vector<Label> itemArr = new Vector<Label>();
+	Vector<Enemy> enemyArr = new Vector<Enemy>();
+	Vector<ShieldBlock> shieldBlockArr = new Vector<ShieldBlock>();
 	boolean flag = true;
 	ImageIcon bgImg;
 	
@@ -202,14 +227,14 @@ class GamePanel extends JPanel implements Runnable{
 		}
 	}
 	
-	public GamePanel(Node gamePanelNode, GameInfoPanel gameInfoPanel) {
+	public GamePanel(Node gamePanelNode, GameInfoPanel gameInfoPanel, Music music) {
 		setLayout(new BorderLayout());
 		setFocusable(true); 
 		addKeyListener(new GameKeyListener());
 		Node bgNode = XMLReader.getNode(gamePanelNode, XMLReader.E_BG);
 		bgImg = new ImageIcon(bgNode.getTextContent());
 		Node soundNode = XMLReader.getNode(gamePanelNode, XMLReader.E_SOUND);
-		music = new Music();
+		this.music = music;
 		music.playAudio(soundNode.getTextContent());
 
 		Node activeScreenNode = XMLReader.getNode(gamePanelNode, XMLReader.E_ACTIVESCREEN);
@@ -234,16 +259,6 @@ class GamePanel extends JPanel implements Runnable{
 				player = new Player(x,y,w,h, life, icon);
 				add(player);
 			}
-		}
-		if(player.getIconText().equals("image/player.png")) {
-			playerBulletIcon = new ImageIcon("image/bullet.png");
-
-		}
-		else if(player.getIconText().equals("image/player3.png")) {
-			playerBulletIcon = new ImageIcon("image/bullet.png");
-		}
-		else {
-			playerBulletIcon = new ImageIcon("image/player_bullet2.png");
 		}
 		GameManagement.life = player.getLife();
 		
@@ -295,41 +310,42 @@ class GamePanel extends JPanel implements Runnable{
 			}
 		}
 
-//		 shieldBlock 노드
-		Node shieldBlocksNode = XMLReader.getNode(activeScreenNode, XMLReader.E_SHIELDBLOCKS);
-		NodeList shieldBlocksNodeList = shieldBlocksNode.getChildNodes();
-		for(int i=0; i<shieldBlocksNodeList.getLength(); i++) {
-			Node node = shieldBlocksNodeList.item(i);
-			if(node.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-			// found!!, <Obj> tag
-			if(node.getNodeName().equals(XMLReader.E_SHIELDBLOCK)) {
-				int x = Integer.parseInt(XMLReader.getAttr(node, "x"));
-				int y = Integer.parseInt(XMLReader.getAttr(node, "y"));
-				int w = Integer.parseInt(XMLReader.getAttr(node, "w"));
-				int h = Integer.parseInt(XMLReader.getAttr(node, "h"));
-				String type = XMLReader.getAttr(node, "type");
-				
-				ImageIcon icon = new ImageIcon(XMLReader.getAttr(node, "img"));
-				shieldBlock = new ShieldBlock(x,y,w,h,icon,type);
-				shieldBlockArr.add(shieldBlock);
-				add(shieldBlock);
-				
-			}
-		}
+		// shieldBlock 노드
+//		Node shieldBlocksNode = XMLReader.getNode(activeScreenNode, XMLReader.E_SHIELDBLOCKS);
+//		NodeList shieldBlocksNodeList = shieldBlocksNode.getChildNodes();
+//		for(int i=0; i<shieldBlocksNodeList.getLength(); i++) {
+//			Node node = shieldBlocksNodeList.item(i);
+//			if(node.getNodeType() != Node.ELEMENT_NODE)
+//				continue;
+//			// found!!, <Obj> tag
+//			if(node.getNodeName().equals(XMLReader.E_SHIELDBLOCK)) {
+//				int x = Integer.parseInt(XMLReader.getAttr(node, "x"));
+//				int y = Integer.parseInt(XMLReader.getAttr(node, "y"));
+//				int w = Integer.parseInt(XMLReader.getAttr(node, "w"));
+//				int h = Integer.parseInt(XMLReader.getAttr(node, "h"));
+//				String type = XMLReader.getAttr(node, "type");
+//				
+//				ImageIcon icon = new ImageIcon(XMLReader.getAttr(node, "img"));
+//				shieldBlock = new ShieldBlock(x,y,w,h,icon,type);
+//				shieldBlockArr.add(shieldBlock);
+//				add(shieldBlock);
+//				
+//			}
+//		}
 
 ////		 스레드 생성
 //		moveEnemyTh = new MoveEnemyThread(this,enemyArr);
 //		moveEnemyTh.start();
-//		
-		enemyShootTh = new EnemyShootThread(this,enemyArr, player,lifeLabel, gameInfoPanel, shieldBlockArr);
-		enemyShootTh.start();
-//		
+//	
+		
+//		enemyShootTh = new EnemyShootThread(this,enemyArr, player,lifeLabel, gameInfoPanel, shieldBlockArr);
+//		enemyShootTh.start();
+	
 		itemTh = new ItemThread(this, itemArr);
 		itemTh.start();
 
-		Thread th = new Thread(this);
-		th.start();	
+//		Thread th = new Thread(this);
+//		th.start();	
  
 	}
 	
@@ -339,13 +355,14 @@ class GamePanel extends JPanel implements Runnable{
 		g.drawImage(bgImg.getImage(), 0, 0, this.getWidth(), this.getHeight(), this);
 	}
 
-	public ArrayList<Label> getItemArr() {
+	public Vector<Label> getItemArr() {
         return itemArr;
     }
 
     public void addItem(Label item) {
         itemArr.add(item);
     }
+   
 //	 키 이벤트
 	public class GameKeyListener extends KeyAdapter {
 		private BulletThread bulletThread;
@@ -353,7 +370,8 @@ class GamePanel extends JPanel implements Runnable{
 		Image bullet1 = bulletIcon1.getImage();
 		ImageIcon bulletIcon2 = new ImageIcon("image/bullet2.png");
 		Image bullet2 = bulletIcon2.getImage();
-
+		PlayerBullet playerBullet;
+		
 		@Override
 		public void keyPressed(KeyEvent e) {
 	        int keyCode = e.getKeyCode();
@@ -377,7 +395,7 @@ class GamePanel extends JPanel implements Runnable{
 	                break;
 
 				case KeyEvent.VK_SPACE:
-					PlayerBullet playerBullet = new PlayerBullet(0,0,25,30, playerBulletIcon);
+					playerBullet = new PlayerBullet(0,0,25,30, playerBulletIcon);
 	
 					if (bulletThread == null || !bulletThread.isAlive()) {
 						if (playerBullet.getY() <= 0) {
@@ -386,7 +404,7 @@ class GamePanel extends JPanel implements Runnable{
 	                        playerBullet.setLocation(player.getX(), player.getY());
 	                    }else {
 	                    	add(playerBullet);
-	                        playerBullet.setLocation(player.getX(), playerBullet.getY());
+	                        playerBullet.setLocation(player.getX(), player.getY());
 	 
 	                    } 
 
@@ -490,31 +508,31 @@ class GamePanel extends JPanel implements Runnable{
 
 
 // GamePanel 스레드 동작 
-    public synchronized void run() {
-    	if(stopFlag == true) {
-    		stopGame();
-    	}
-        if (GameManagement.life == 0) {
-            itemTh.interrupt();
-            enemyShootTh.interrupt();
-        	for(Enemy enemy:enemyArr) {
-        		enemy.waitFlag();
-        	}
-        	this.waitFlag();
-
-        }
-    }	
+//    public synchronized void run() {
+//    	if(stopFlag == true) {
+//    		stopGame();
+//    	}
+//        if (GameManagement.life == 0) {
+//            itemTh.interrupt();
+//            enemyShootTh.interrupt();
+//        	for(Enemy enemy:enemyArr) {
+//        		enemy.waitFlag();
+//        	}
+//        	this.waitFlag();
+//
+//        }
+//    }	
 
 // enemy가 총알 발사하는 스레드
 class EnemyShootThread extends Thread {
     private GamePanel gamePanel;
-    private ArrayList<Enemy> enemyArr;
+    private Vector<Enemy> enemyArr;
     private Bullet bullet;
     private Player player;
     private JLabel lifeLabel;
     private ImageIcon bulletIcon = new ImageIcon("image/enemy_bullet.png");
     private GameInfoPanel gameInfoPanel;
-    private ArrayList<ShieldBlock> shieldBlockArr;
+    private Vector<ShieldBlock> shieldBlockArr;
     
 	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
@@ -526,7 +544,7 @@ class EnemyShootThread extends Thread {
 		}
 	}
 
-    public EnemyShootThread(GamePanel gamePanel, ArrayList<Enemy> enemyArr, Player player, JLabel lifeLabel, GameInfoPanel gameInfoPanel, ArrayList<ShieldBlock> shieldBlockArr) {
+    public EnemyShootThread(GamePanel gamePanel, Vector<Enemy> enemyArr, Player player, JLabel lifeLabel, GameInfoPanel gameInfoPanel, Vector<ShieldBlock> shieldBlockArr) {
         this.gamePanel = gamePanel;
         this.enemyArr = enemyArr;
         this.player = player;
@@ -541,13 +559,13 @@ class EnemyShootThread extends Thread {
     	for(int i = 0; i<r; i++) {
           int enemyNum = (int) (Math.random() * enemyArr.size());
           Enemy randomEnemy = enemyArr.get(enemyNum);
-          if(randomEnemy.getType().equals("LeftRight")||randomEnemy.getType().equals("RightLeft") || randomEnemy.getType().equals("Free")) {
-        	  Bullet bullet = new Bullet(randomEnemy.getX(), randomEnemy.getY(), 40,43, bulletIcon, gamePanel, player, shieldBlockArr, gameInfoPanel);
-//        	  if(GameManagement.stopFlag == true) {
-//        		  bullet.setStopFlag();
-//        	  }
-          }
-          else i--;
+//          if(randomEnemy.getType().equals("LeftRight")||randomEnemy.getType().equals("RightLeft") || randomEnemy.getType().equals("Free")) {
+//        	  Bullet bullet = new Bullet(randomEnemy.getX(), randomEnemy.getY(), 40,43, bulletIcon, gamePanel, player, shieldBlockArr, gameInfoPanel);
+////        	  if(GameManagement.stopFlag == true) {
+////        		  bullet.setStopFlag();
+////        	  }
+//          }
+//          else i--;
     	} 
     	
     }
@@ -573,7 +591,7 @@ class EnemyShootThread extends Thread {
         	if(stopFlag == true) waitFlag();
         	setBullet();
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -585,8 +603,8 @@ class EnemyShootThread extends Thread {
  // 아이템 스레드
 class ItemThread extends Thread {
 	private GamePanel gamePanel;
-	private ArrayList<Label> itemArr;
-	private ArrayList<Label> activeItem = new ArrayList<Label>();
+	private Vector<Label> itemArr;
+	private Vector<Label> activeItem = new Vector<Label>();
 	private boolean stopFlag = false;
 	private boolean getStopFlag() {return stopFlag;}
 	private void setStopFlag() {
@@ -597,7 +615,7 @@ class ItemThread extends Thread {
 		}
 	}
 	
-	public ItemThread(GamePanel gamePanel, ArrayList<Label> itemArr) {
+	public ItemThread(GamePanel gamePanel, Vector<Label> itemArr) {
 		this.gamePanel = gamePanel;
 		this.itemArr = itemArr;
 	}
@@ -611,19 +629,7 @@ class ItemThread extends Thread {
         while (itemLabel.getY()<= gamePanel.getHeight()) { // 아이템이 패널의 높이에 도달할 때까지 떨어진다
 			
 			itemLabel.setXY(itemLabel.getX(), itemLabel.getY()+10);
-            // 생명아이템이 player에 닿았을 때
-			if(r>=1 && r<3) {
-	            if (itemLabel.getBounds().intersects(player.getBounds())) {
-	            	Music item = new Music();
-	            	item.playAudio("item");
-	            	int newLife = GameManagement.life +1;
-	            	gameInfoPanel.setLifeLabel(newLife);
-	            	GameManagement.life = newLife;
-	                gamePanel.remove(itemLabel);
-	                System.out.println("plus"+GameManagement.life);
-	            } 
-
-			}
+			//
 
 			gamePanel.repaint();
 	        try {
@@ -659,13 +665,10 @@ class ItemThread extends Thread {
 			int r = (int)(Math.random()*10+1);
 			Label itemLabel;
 			// 40%확률로 아이템 생성
-			if(r>=3 && r<5) {
-				itemLabel = itemArr.get(0);
-				moveItem(itemLabel,r);
-			}
-			else if(r>=1 && r<3) { // 생명아이템
-				itemLabel = itemArr.get(1);
-				moveItem(itemLabel,r);
+			if(r>=1 && r<5) {
+				int random = (int)(Math.random()*itemArr.size());
+				itemLabel = itemArr.get(random);
+				moveItem(itemLabel,random);
 			}
 			
 	        try {

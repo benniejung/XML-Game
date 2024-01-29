@@ -1,0 +1,29 @@
+<MainGame>
+<Screen>
+<Size w= "800" h="900"></Size>
+</Screen>
+<GamePanel>
+<Bg>image/background/bg1.jpg</Bg>
+<Sound>background1</Sound>
+<ActiveScreen>
+
+<Enemies>
+<Enemy x="193" y="286" w="50" h="60" type="LeftRight" speed="2" life="2" img="image/enemy1.png"></Enemy>
+<Enemy x="509" y="297" w="50" h="60" type="LeftRight" speed="2" life="2" img="image/enemy1.png"></Enemy>
+</Enemies>
+
+<Player>
+<Obj x="388" y="741" w="40" h="60" life="5" img="image/player.png"></Obj>
+</Player>
+
+<ShieldBlocks>
+</ShieldBlocks>
+
+<Items>
+<Item x="682" y="539" w="50" h="60" img="image/heart.png"></Item>
+<Item x="725" y="493" w="50" h="60" img="image/shield.png"></Item>
+</Items>
+
+</ActiveScreen>
+</GamePanel>
+</MainGame>

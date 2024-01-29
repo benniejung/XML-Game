@@ -64,6 +64,37 @@ public class Music {
 			
 		}
 	}
+	// 오디오 정지
+	public void stopAudio(String name) {
+		switch(name) {
+		case "all":
+			//startFrameMusic.stop();
+			gameBackgroundMusic1.stop();
+			gameBackgroundMusic2.stop();
+			dieMusic.stop();
+			shootMusic.stop();
+			itemMusic.stop();
+			break;
+		case "startFrame":
+			startFrameMusic.stop();
+			break;
+		case "background1":
+			gameBackgroundMusic1.stop();
+			break;
+		case "background2":
+			gameBackgroundMusic2.stop();
+			break;
+		case "die":
+			dieMusic.stop();
+			break;
+		case "shoot":
+			shootMusic.stop();
+			break;
+		case "item":
+			itemMusic.stop();
+			break;
+		}
+	}
 
 
 }

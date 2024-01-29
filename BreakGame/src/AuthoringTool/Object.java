@@ -100,7 +100,7 @@ class EnemyObj extends Object {
 			String iconDescription = enemy.icon.getDescription();
 			text+= "<Enemy x=\""+enemy.getX()+"\" y=\""+enemy.getY()+"\" w=\""+enemy.getW()+"\" h=\""+enemy.getH()+"\"";
 			text+= " type=\""+enemy.getType()+"\" speed=\""+enemy.getSpeed()+"\" life=\""+enemy.getLife()+"\"";
-			text+= " icon=\""+iconDescription+"\"></Enemy>\n";
+			text+= " img=\""+iconDescription+"\""+"></Enemy>\n";
 			
 
 		}
@@ -132,7 +132,7 @@ class PlayerObj extends Object {
 			String iconDescription = playerObj.icon.getDescription();
 			text+= "<Obj x=\""+playerObj.getX()+"\" y=\""+playerObj.getY()+"\" w=\""+playerObj.getW()+"\" h=\""+playerObj.getH()+"\"";
 			text+= " life=\""+playerObj.getLife()+"\"";
-			text+= " icon=\""+iconDescription+"\"></Obj>\n";
+			text+= " img=\""+iconDescription+"\"></Obj>\n";
 			
 
 		}
@@ -159,7 +159,7 @@ class ShieldBlockObj extends Object {
 			String iconDescription = shieldBlock.icon.getDescription();
 			text+= "<ShieldBlock x=\""+shieldBlock.getX()+"\" y=\""+shieldBlock.getY()+"\" w=\""+shieldBlock.getW()+"\" h=\""+shieldBlock.getH()+"\"";
 			text+= " type=\""+shieldBlock.getType()+"\"";
-			text+= " icon=\""+iconDescription+"\"></ShieldBlock>\n";
+			text+= " img=\""+iconDescription+"\"></ShieldBlock>\n";
 			
 
 		}
@@ -186,13 +186,13 @@ class ItemObj extends Object {
 			ItemObj item = heartItemObjArr.get(i);
 			String iconDescription = item.icon.getDescription();
 			text+= "<Item x=\""+item.getX()+"\" y=\""+item.getY()+"\" w=\""+item.getW()+"\" h=\""+item.getH()+"\"";
-			text+= " icon=\""+iconDescription+"\"></Item>\n";
+			text+= " img=\""+iconDescription+"\"></Item>\n";
 		}
 		for(int i =0; i<shieldItemObjArr.size(); i++) {
 			ItemObj item = shieldItemObjArr.get(i);
 			String iconDescription = item.icon.getDescription();
 			text+= "<Item x=\""+item.getX()+"\" y=\""+item.getY()+"\" w=\""+item.getW()+"\" h=\""+item.getH()+"\"";
-			text+= " icon=\""+iconDescription+"\"></Item>\n";
+			text+= " img=\""+iconDescription+"\"></Item>\n";
 		}
 		text+="</Items>\n";
 		return text;

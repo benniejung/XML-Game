@@ -4,7 +4,7 @@
 		<Size w="800" h="900"></Size>
 	</Screen>
 	<GamePanel>
-		<Bg>image/bg3.jpg</Bg>
+		<Bg>image/background/bg3.jpg</Bg>
 		<Sound>background2</Sound>
 		<ActiveScreen> <!-- 실제 게임이 실행되는 화면 -->
 			<Enemies>				
@@ -18,6 +18,13 @@
 				<Enemy x="450" y="260" w="60" h="55" type = "Free" life = "2" speed = "10" img="image/enemy5.png"></Enemy>
 				<Enemy x="300" y="260" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy6.png"></Enemy>
 				<Enemy x="150" y="260" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy6.png"></Enemy>
+				<Enemy x="100" y="260" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy6.png"></Enemy>
+				<Enemy x="550" y="260" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy6.png"></Enemy>
+				
+				<Enemy x="150" y="150" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="300" y="150" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy5.png"></Enemy>
+				<Enemy x="400" y="150" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy4.png"></Enemy>
+				<Enemy x="550" y="150" w="80" h="60" type = "Free" life = "2" speed = "10" img="image/enemy6.png"></Enemy>
 		
 			</Enemies>
 			<Player>

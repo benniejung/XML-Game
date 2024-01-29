@@ -1,7 +1,6 @@
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -121,10 +120,9 @@ public class Enemy extends JLabel implements Runnable{
 
 				 }
 				 else {
-	        			int newX = x + speed;
-	        			this.setLocation(newX, y);
-	        			this.setXY(newX, y);
-	        			
+						int newX = x + speed;
+						this.setLocation(newX, y);
+						this.setXY(newX, y);        			
 
 				 } 
 	         }
